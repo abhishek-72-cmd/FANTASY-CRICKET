@@ -1,0 +1,399 @@
+/* Main container styling */
+.join-contest-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contest title styling */
+.contest-title {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+/* Details container */
+.contest-details {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+/* Individual detail items */
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.detail-label {
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Payment button styling */
+.pay-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pay-button:hover {
+  background-color: #219653;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+}
+
+.pay-button:active {
+  transform: translateY(0);
+}
+
+/* Loading state */
+.pay-button[disabled] {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.pay-button[disabled]:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Error message */
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+
+/* TeamBuilder.css */
+
+/* Base Container */
+.team-builder-container {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  max-width: 1200px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.team-builder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.team-builder-title {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}
+
+.team-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-count-label {
+  font-size: 14px;
+  color: #555;
+}
+
+.team-count-select {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.apply-btn {
+  padding: 5px 15px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.apply-btn:hover {
+  background: #45a049;
+}
+
+.team-builder-content {
+  display: flex;
+  gap: 20px;
+}
+
+/* Players Pool */
+.players-pool {
+  width: 35%;
+}
+
+.pool-column {
+  background: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.pool-header {
+  background: #eaeaea;
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.pool-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.team-pool-section {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.team-pool-section:last-child {
+  border-bottom: none;
+}
+
+.team-pool-header {
+  margin-bottom: 10px;
+}
+
+.team-pool-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.player-list {
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 5px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Player Cards */
+.player-card {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background-color: #e3e3ff;
+  border: 1px solid #b8b8ff;
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.player-card:hover {
+  background-color: #d0d0ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.player-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ccc;
+  margin-right: 10px;
+  border: 2px solid #fff;
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+
+.player-meta {
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
+.delete-btn {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 18px;
+  height: 18px;
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.player-card:hover .delete-btn {
+  opacity: 1;
+}
+
+/* Role-based coloring */
+.player-card[data-role="Captain"] {
+  background-color: #ffe4e1;
+  border-color: #ffb7b7;
+}
+
+.player-card[data-role="Vice Captain"] {
+  background-color: #f5e1ff;
+  border-color: #e0b7ff;
+}
+
+.player-card[data-role="Wicket Keeper"] {
+  background-color: #e0fff1;
+  border-color: #b7ffd8;
+}
+
+.player-card[data-role="Batsman"] {
+  background-color: #e6f7ff;
+  border-color: #b7e4ff;
+}
+
+.player-card[data-role="Bowler"] {
+  background-color: #f0f0f0;
+  border-color: #d0d0d0;
+}
+
+.player-card[data-role="All Rounder"] {
+  background-color: #fff5d1;
+  border-color: #ffe8a1;
+}
+
+/* User Teams */
+.user-teams {
+  width: 65%;
+  display: flex;
+  gap: 20px;
+}
+
+.user-team {
+  flex: 1;
+  background: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.user-team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.user-team-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.points-summary {
+  font-size: 14px;
+  color: #666;
+}
+
+.role-container {
+  margin-bottom: 12px;
+}
+
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.role-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.role-limits {
+  font-size: 12px;
+  color: #666;
+}
+
+.role-dropzone {
+  min-height: 50px;
+  background: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  transition: all 0.2s;
+}
+
+.role-dropzone:hover {
+  border-color: #999;
+}
+
+/* SortableJS classes */
+.sortable-ghost {
+  opacity: 0.5;
+  background: #f8f8f8 !important;
+}
+
+.sortable-chosen {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .team-builder-content {
+    flex-direction: column;
+  }
+  
+  .players-pool, .user-teams {
+    width: 100%;
+  }
+  
+  .user-teams {
+    margin-top: 20px;
+  }
+}

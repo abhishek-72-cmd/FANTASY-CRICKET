@@ -1,0 +1,168 @@
+body {
+  font-family: Arial;
+  margin: 20px;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.column {
+  width: 230px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 100;
+}
+
+
+    .column-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #eaeaea;
+      padding: 5px 10px;
+      font-weight: bold;
+    }
+
+    .role-group {
+      background: #fff;
+      margin-bottom: 10px;
+      padding: 5px;
+      min-height: 40px;
+      border: 1px dashed #aaa;
+    }
+
+    .role-group strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      padding: 6px;
+      background-color: #e3e3ff;
+      border: 1px solid #999;
+      border-radius: 5px;
+      margin: 5px 0;
+      cursor: move;
+      user-select: none;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .player-img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ccc;
+    }
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .player-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .player-meta {
+      font-size: 12px;
+      color: #555;
+      font-weight: 100;
+      font-style: italic;
+      margin-top: 4px;
+      margin-left: 20px;
+    }
+
+    .role-icon {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+
+    /* Role-based coloring */
+    .user[data-role="Captain"] {
+      background-color: #ffe4e1;
+    }
+
+    .user[data-role="Vice Captain"] {
+      background-color: #f5e1ff;
+    }
+
+    .user[data-role="Wicket Keeper"] {
+      background-color: #e0fff1;
+    }
+
+    .user[data-role="Batsman"] {
+      background-color: #e6f7ff;
+    }
+
+    .user[data-role="Bowler"] {
+      background-color: #f0f0f0;
+    }
+
+    .user[data-role="All Rounder"] {
+      background-color: #fff5d1;
+    }
+
+    /* Compact Mode */
+    .user.compact .player-meta {
+      display: none;
+    }
+
+    .user.compact .player-name {
+      font-size: 13px;
+    }
+
+
+    .delete-btn {
+      background: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+      padding: 2px 5px;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+
+    .points-summary {
+      font-weight: normal;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .accordion {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+
+    .accordion-header {
+      background: #ddd;
+      padding: 8px 10px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .accordion-body {
+      overflow: hidden;
+      transition: height 0.3s ease;
+      height: auto;
+      /* will be controlled via JS */
+    }
+
+/* …copy the rest of your CSS here exactly as in the <style>… */
