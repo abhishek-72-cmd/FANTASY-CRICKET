@@ -11,7 +11,7 @@ const getOrFetchPlayers = async (req, res) => {
   try {
     // 🔷 Step 1: Get fixture details (local & visitor team IDs)
     const [fixtureRows] = await db.query(
-      'SELECT localteam_id, visitorteam_id FROM fixtures WHERE id = ?',
+      'SELECT league_id, localteam_id, visitorteam_id FROM fixtures WHERE id = ?',
       [match_id]
     );
 
@@ -19,13 +19,21 @@ const getOrFetchPlayers = async (req, res) => {
       return res.status(404).json({ success: false, error: 'Fixture not found' });
     }
 
-    const { localteam_id, visitorteam_id } = fixtureRows[0];
+    const { league_id, localteam_id, visitorteam_id } = fixtureRows[0];
 
     // 🔷 Step 2: Helper function to get players for a team
     const getPlayersForTeam = async (teamId) => {
       const [rows] = await db.query(
-        'SELECT * FROM players WHERE team_id = ?',
-        [teamId]
+        `SELECT
+           p.*,
+           COALESCE(ppc.last_known_credit_points, 0) AS credit_points,
+           COALESCE(ppc.last_known_credit_points, 0) AS points
+         FROM players p
+         LEFT JOIN player_points_cache ppc
+           ON ppc.player_id = p.player_id
+          AND ppc.league_id = ?
+         WHERE p.team_id = ?`,
+        [league_id, teamId]
       );
       return rows;
     };

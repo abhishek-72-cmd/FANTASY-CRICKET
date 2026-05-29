@@ -81,14 +81,19 @@ const UseMatchActivation = (matchId) => {
         setCheckContest(true);
       }
 
-      // ✅ 2. Check if player points have been updated
+      // ✅ 2. Check if player credit points have been updated
       const pointsRes = await axios.get(
         `http://localhost:5000/api/admin/points/get-points/${matchId}`
       );
       const pointsPresent = pointsRes?.data?.pointsAvailable;
 
       if (!pointsPresent) {
-        alert("❌ Please update player points before activating the match.");
+        const missingCredits = pointsRes?.data?.missingCredits;
+        alert(
+          missingCredits
+            ? `❌ Please update player credit points before activating the match. Missing credits: ${missingCredits}`
+            : "❌ Please update player credit points before activating the match."
+        );
         setCheckPoints(false);
         return false;
       } else {

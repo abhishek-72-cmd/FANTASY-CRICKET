@@ -1,8 +1,6 @@
 require('dotenv').config();
 const axios = require('axios');
 const db = require('../../../config/db/db');
-const getPreviousPlayerPoints = require('./getPreviousPlayerPoints ')
-const syncToPlayerPointCache = require('../players/syncToPlayerPointCache')
 
 // code is working when you directly hit the api but not woek wor getplayers function 
 
@@ -131,15 +129,29 @@ if (!league_id) throw new Error('league_id missing in fixture');
     const is_substitute = player.lineup?.substitution ? 0 : 1;
     const position = player.position?.name || null;
 
-    const [existing] = await db.query(
-      `SELECT points FROM 22_match_players WHERE match_id = ? AND player_id = ?`,
-      [match_id, playerId]
+    await db.query(
+      `INSERT INTO players
+       (player_id, team_id, season_id, fullname, position, image_path, battingstyle, bowlingstyle)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         team_id = VALUES(team_id),
+         season_id = VALUES(season_id),
+         fullname = VALUES(fullname),
+         position = VALUES(position),
+         image_path = VALUES(image_path),
+         battingstyle = VALUES(battingstyle),
+         bowlingstyle = VALUES(bowlingstyle)`,
+      [
+        playerId,
+        team_id,
+        data?.data?.season_id || null,
+        fullname,
+        position,
+        player.image_path || null,
+        player.battingstyle || null,
+        player.bowlingstyle || null
+      ]
     );
-
-    let points = existing?.points || null;
-    if (points === null) {
-      points = await getPreviousPlayerPoints(team_id, playerId);
-    }
 
     const [metaRows] = await db.query(
       `SELECT image_path, battingstyle, bowlingstyle FROM players WHERE player_id = ?`,
@@ -149,46 +161,30 @@ if (!league_id) throw new Error('league_id missing in fixture');
 
     await db.query(
       `INSERT INTO 22_match_players
-       (match_id,  league_id, player_id, team_id, fullname, is_substitute, position, points, image_path, battingstyle, bowlingstyle)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       (match_id, league_id, player_id, team_id, fullname, is_substitute, position, image_path, battingstyle, bowlingstyle)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          team_id = VALUES(team_id),
          fullname = VALUES(fullname),
          is_substitute = VALUES(is_substitute),
          position = VALUES(position),
-         points = VALUES(points),
          image_path = VALUES(image_path),
          battingstyle = VALUES(battingstyle),
          bowlingstyle = VALUES(bowlingstyle),
-           league_id = VALUES(league_id)
+         league_id = VALUES(league_id)
          `,
          
       [
         match_id,league_id, playerId, team_id, fullname,
-        is_substitute, position, points,
+        is_substitute, position,
         meta.image_path || null,
         meta.battingstyle || null,
         meta.bowlingstyle || null
       ]
     );
 
-    if (points !== null) {
-      await db.query(
-       `INSERT INTO player_points_cache (player_id, team_id, league_id, last_known_points, position)
-   VALUES (?, ?, ?, ?, ?)
-   ON DUPLICATE KEY UPDATE
-     last_known_points = VALUES(last_known_points),
-     team_id = VALUES(team_id),
-     position = VALUES(position),
-     league_id = VALUES(league_id)
-  `,
-  [playerId, team_id, league_id, points, position]
-      );
-    }
-
     savedCount++;
   }
-await syncToPlayerPointCache(match_id);
   return savedCount;
 };
 

@@ -61,11 +61,11 @@ exports.register = async (req, res, next) => {
 
 
     // Generate JWT token
-// const token = jwt.sign(
-//   { userId: result.insertId, role: 'admin' }, // <-- role added
-//   process.env.JWT_SECRET,
-//   { expiresIn: "1d" }
-// );
+const token = jwt.sign(
+  { userId: result.insertId, role: 'admin' }, // <-- role added
+  process.env.JWT_SECRET,
+  { expiresIn: "1d" }
+);
 
 
     
@@ -88,8 +88,6 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
-
-  
 
   try {
     // Validate inputs

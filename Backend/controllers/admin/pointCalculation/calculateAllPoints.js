@@ -112,7 +112,14 @@ const calculateAllPoints = async (req, res) => {
       points += (stats.runoutsDirect || 0) * getRule('Fielding', 'Run Out (Direct hit)');
       points += (stats.runoutsIndirect || 0) * getRule('Fielding', 'Run Out (Not a direct hit)');
 
-      await db.query('INSERT INTO player_match_points (match_id, player_id, points) VALUES (?, ?, ?)', [matchId, playerId, points]);
+      await db.query(
+        `INSERT INTO player_match_points (match_id, player_id, fantasy_points, points)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           fantasy_points = VALUES(fantasy_points),
+           points = VALUES(points)`,
+        [matchId, playerId, points, points]
+      );
     }
 
     console.log(`✅ Player points saved for match ${matchId}`);
@@ -139,8 +146,8 @@ const calculateAllPoints = async (req, res) => {
       let totalPoints = 0;
 
       for (const p of players) {
-        const [rows] = await db.query('SELECT points FROM player_match_points WHERE match_id = ? AND player_id = ?', [matchId, p.playerId]);
-        const playerPts = rows.length > 0 ? rows[0].points : 0;
+        const [rows] = await db.query('SELECT fantasy_points FROM player_match_points WHERE match_id = ? AND player_id = ?', [matchId, p.playerId]);
+        const playerPts = rows.length > 0 ? rows[0].fantasy_points : 0;
         let multiplier = p.role === 'Captain' ? 2 : (p.role === 'Vice Captain' ? 1.5 : 1);
 
         let bonus = 0;
@@ -154,8 +161,12 @@ const calculateAllPoints = async (req, res) => {
       }
 
       await db.query(
-  'INSERT INTO user_team_points (match_id, user_id, user_team_id, points) VALUES (?, ?, ?, ?)',
-  [matchId, userId, ut.id, totalPoints]
+  `INSERT INTO user_team_points (match_id, user_id, user_team_id, fantasy_points, points)
+   VALUES (?, ?, ?, ?, ?)
+   ON DUPLICATE KEY UPDATE
+     fantasy_points = VALUES(fantasy_points),
+     points = VALUES(points)`,
+  [matchId, userId, ut.id, totalPoints, totalPoints]
 );
     }
 

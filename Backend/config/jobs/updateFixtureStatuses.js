@@ -6,8 +6,6 @@ const cron = require('node-cron');
 // match status will be updated beyond 5 days from currentdate 
 
 
-
-
 const API_TOKEN = process.env.CRICKET_API_KEY;
 
 const updateStatuses = async () => {

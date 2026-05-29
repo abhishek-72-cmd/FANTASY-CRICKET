@@ -30,6 +30,16 @@ const positionToRole = {
    "Top Order Batter" : "Batsman"
 };
 
+const normalizePlayers = (players) =>
+  players
+    .filter(p => positionToRole[p.position])
+    .map(p => ({
+      player_id: p.player_id,
+      fullname: p.fullname,
+      role: positionToRole[p.position],
+      credit_points: Number(p.credit_points ?? p.points ?? 0),
+    }));
+
 const CreateTeam = ({
   mode = 'create',
   matchId: propMatchId,
@@ -44,7 +54,7 @@ const CreateTeam = ({
   const [userTeam, setUserTeam] = useState({});
   const [captainId, setCaptainId] = useState('');
   const [viceCaptainId, setViceCaptainId] = useState('');
-  const [totalPointsUsed, setTotalPointsUsed] = useState();
+  const [totalCreditsUsed, setTotalCreditsUsed] = useState(0);
   const [lineupStatus, setLineupStatus] = useState('confirmed');
 
   const navigate = useNavigate();
@@ -59,44 +69,16 @@ const CreateTeam = ({
   useEffect(() => {
     if (!matchId) return;
 
-    //  Replaced fetch with axios
-    axios.get(`http://localhost:5000/api/admin/squads/fetch-players/${matchId}`)
-      .then(res => {
-        const data = res.data?.data;
-        console.log(data)
-        const status = res.data?.lineup_status || 'confirmed';
-          setLineupStatus(status);
-
-        if (!data || data.length < 2) return;
-
-        const [teamA, teamB] = data;
-
-        const normalize = (players) =>
-          players
-            .filter(p => positionToRole[p.position] && p.points >= 0)
-            .map(p => ({
-              player_id: p.player_id,
-              fullname: p.fullname,
-              role: positionToRole[p.position],
-              points: p.points || 0,
-            }));
-
-    const teamAProcessed = normalize(teamA.players);
-    const teamBProcessed = normalize(teamB.players);
-
-
-            setTeamAPlayers(teamAProcessed);
+    const applyPlayers = (teamAProcessed, teamBProcessed) => {
+      setTeamAPlayers(teamAProcessed);
       setTeamBPlayers(teamBProcessed);
 
-     //  Create playerId -> player map
-   const allPlayersMap = {};
+      const allPlayersMap = {};
       [...teamAProcessed, ...teamBProcessed].forEach(p => {
         allPlayersMap[p.player_id] = p;
-      })
+      });
 
-
-      
-  if (mode === 'edit' && initialPlayers?.length) {
+      if (mode === 'edit' && initialPlayers?.length) {
         const reconstructedTeam = {};
         initialPlayers.forEach(p => {
           const fullPlayer = allPlayersMap[p.playerId];
@@ -107,14 +89,46 @@ const CreateTeam = ({
         });
         setUserTeam(reconstructedTeam);
       }
+    };
 
-    })
-      .catch(err => console.error('Failed to fetch players', err));
-  }, [matchId]);
+    const fetchSquadPlayers = async () => {
+      const res = await axios.get(`http://localhost:5000/api/admin/squads/get-or-fetch-players/${matchId}`);
+      const teamAProcessed = normalizePlayers(res.data?.localPlayers || []);
+      const teamBProcessed = normalizePlayers(res.data?.visitorPlayers || []);
+
+      setLineupStatus('squad');
+      applyPlayers(teamAProcessed, teamBProcessed);
+    };
+
+    const fetchPlayers = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/admin/squads/fetch-players/${matchId}`);
+        const data = res.data?.data;
+        const status = res.data?.lineup_status || 'confirmed';
+
+        if (!data || data.length < 2) {
+          await fetchSquadPlayers();
+          return;
+        }
+
+        const [teamA, teamB] = data;
+        const teamAProcessed = normalizePlayers(teamA.players || []);
+        const teamBProcessed = normalizePlayers(teamB.players || []);
+
+        setLineupStatus(status);
+        applyPlayers(teamAProcessed, teamBProcessed);
+      } catch (err) {
+        console.warn('Final lineup not available. Loading full squad players.', err.response?.data || err.message);
+        await fetchSquadPlayers();
+      }
+    };
+
+    fetchPlayers().catch(err => console.error('Failed to fetch players', err));
+  }, [matchId, mode]);
 
   useEffect(() => {
-    const used = Object.values(userTeam).flat().reduce((acc, p) => acc + p.points, 0);
-    setTotalPointsUsed(used);
+    const used = Object.values(userTeam).flat().reduce((acc, p) => acc + p.credit_points, 0);
+    setTotalCreditsUsed(used);
   }, [userTeam]);
 
   const isAlreadySelected = (id) =>
@@ -123,7 +137,7 @@ const CreateTeam = ({
   const handleAddPlayer = (player) => {
     if (isAlreadySelected(player.player_id)) return alert('Player already selected');
     if (Object.values(userTeam).flat().length >= 11) return alert('You can only select 11 players');
-    if (totalPointsUsed + player.points > MAX_POINTS) return alert('You have reached 100 points limit');
+    if (totalCreditsUsed + player.credit_points > MAX_POINTS) return alert('You have reached 100 credit limit');
 
     const role = player.role;
     const current = userTeam[role] || [];
@@ -194,7 +208,7 @@ useEffect(() => {
       grouped[role].push({
         player_id: player.playerId,
         fullname: player.fullname,
-        points: player.points,
+        credit_points: player.credit_points ?? player.points ?? 0,
         role: role
       });
     });
@@ -217,16 +231,16 @@ const handleShowTeams = ()=>{
         <h2>{matchTitle}</h2>
         <h2>{matchId}</h2>
         <h3>Paid amount: ₹{entryFee}</h3>
-        <h4>Total Points Used: {totalPointsUsed} / {MAX_POINTS}</h4>
+        <h4>Total Credits Used: {totalCreditsUsed} / {MAX_POINTS}</h4>
       </div>
 
       <div className="teams-row" style={{ display: 'flex', gap: '2rem' }}>
         {/* Team A */}
         <div style={{ flex: 1 }}>
-             {/* ⚠️ Warning if lineup is fallback */}
-              {lineupStatus === 'fallback' && (
+             {/* Warning if final lineup is not available yet */}
+              {lineupStatus === 'squad' && (
         <div style={{ backgroundColor: '#ff9800', padding: '10px', margin: '15px 0', color: 'white', borderRadius: '5px' }}>
-          ⚠️ Final lineup not yet announced. You are viewing players from the last match.
+          Final lineup not yet announced. You are viewing the tentative squad.
         </div>
       )}
           <h3>Team A Pool</h3>
@@ -236,7 +250,7 @@ const handleShowTeams = ()=>{
               style={{ padding: '5px', border: '1px solid #aaa', margin: '5px', cursor: 'pointer' }}
               onClick={() => handleAddPlayer(player)}
             >
-              {player.fullname} ({player.role}) - {player.points} pts
+              {player.fullname} ({player.role}) - {player.credit_points} credits
             </div>
           ))}
         </div>
@@ -250,7 +264,7 @@ const handleShowTeams = ()=>{
               style={{ padding: '5px', border: '1px solid #aaa', margin: '5px', cursor: 'pointer' }}
               onClick={() => handleAddPlayer(player)}
             >
-              {player.fullname} ({player.role}) - {player.points} pts
+              {player.fullname} ({player.role}) - {player.credit_points} credits
             </div>
           ))}
         </div>
@@ -264,7 +278,7 @@ const handleShowTeams = ()=>{
               <div style={{ border: '1px dashed #999', padding: '4px', minHeight: 40 }}>
                 {(userTeam[role] || []).map(player => (
                   <div key={player.player_id} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>{player.fullname} ({player.points} pts)</span>
+                    <span>{player.fullname} ({player.credit_points} credits)</span>
                     <button onClick={() => handleRemovePlayer(role, player.player_id)}>❌</button>
                   </div>
                 ))}

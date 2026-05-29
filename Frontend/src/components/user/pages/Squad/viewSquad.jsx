@@ -48,7 +48,7 @@ const ViewSquad = () => {
           ? {
               ...team,
               players: team.players.map(p =>
-                p.player_id === playerId ? { ...p, points: value } : p
+                p.player_id === playerId ? { ...p, credit_points: value, points: value } : p
               ),
             }
           : team
@@ -71,7 +71,7 @@ const ViewSquad = () => {
         .flatMap(team => Array.isArray(team.players) ? team.players : [])
         .map(p => ({
           player_id: p.player_id,
-          points: parseInt(p.points || 0),
+          credit_points: parseFloat(p.credit_points ?? p.points ?? 0),
         }));
 
       console.log("Saving points data:", pointsData);
@@ -80,10 +80,10 @@ const ViewSquad = () => {
         `http://localhost:5000/api/admin/squads/update-points/${matchId}`,
         { pointsData }
       );
-      alert('Points saved!');
+      alert('Credit points saved!');
     } catch (err) {
       console.error("Error saving points:", err);
-      alert('Error saving points');
+      alert('Error saving credit points');
     } finally {
       setSaving(false);
     }
@@ -105,7 +105,7 @@ const ViewSquad = () => {
                 <th>Name</th>
                 <th>Captain</th>
                 <th>Wicketkeeper</th>
-                <th>Points</th>
+                <th>Credit Points</th>
               </tr>
             </thead>
             <tbody>
@@ -117,7 +117,7 @@ const ViewSquad = () => {
                   <td>
                     <input
                       type="number"
-                      value={player.points ?? ''}
+                      value={player.credit_points ?? player.points ?? ''}
                       onChange={e =>
                         handleChange(team.team_id, player.player_id, e.target.value)
                       }
@@ -131,7 +131,7 @@ const ViewSquad = () => {
       ))} 
 
       <button onClick={handleSave} disabled={saving}>
-        {saving ? 'Saving...' : 'Save Points'}
+        {saving ? 'Saving...' : 'Save Credit Points'}
       </button>
     </div>
   );

@@ -69,7 +69,7 @@ const AdminRegister = () => {
           <button type="submit" className="auth-button">Register</button>
         </form>
         <div className="auth-footer">
-          Already have an account? <a href="/admin_login">Login here</a>
+          Already have an account? <a href="/admin/login">Login here</a>
         </div>
       </div>
     </div>

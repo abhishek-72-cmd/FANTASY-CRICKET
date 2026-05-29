@@ -1,6 +1,7 @@
 const axios = require ('axios');
 const db = require('../../../config/db/db');
 const save22PlayersService = require('../players/save22players')
+const savePlayersForFixture = require('./savePlayersForFixture');
 
 
 // this code is updated with image pth and bowling style and getting all the players from cache 
@@ -145,6 +146,7 @@ const getPlayers = async (req, res) => {
   'SELECT league_id, localteam_id, visitorteam_id FROM fixtures WHERE id = ?',
   [match_id]
 );
+console.log("fixtureInfo:", fixtureInfo);
 if (!fixtureInfo) {
   return res.status(404).json({ message: 'Fixture not found' });
 }
@@ -160,13 +162,17 @@ const { league_id, localteam_id, visitorteam_id } = fixtureInfo;
          p.fullname,
          p.is_substitute,
          p.position,
-         p.points,
+         COALESCE(ppc.last_known_credit_points, 0) AS credit_points,
+         COALESCE(ppc.last_known_credit_points, 0) AS points,
          p.image_path,
          p.battingstyle,
          p.bowlingstyle,
          t.name AS team_name
        FROM 22_match_players p
        LEFT JOIN teams t ON p.team_id = t.id
+       LEFT JOIN player_points_cache ppc
+         ON ppc.player_id = p.player_id
+        AND ppc.league_id = p.league_id
        WHERE p.match_id = ? AND p.league_id = ?
        ORDER BY p.team_id, p.fullname`,
       [match_id, league_id]
@@ -183,7 +189,8 @@ const { league_id, localteam_id, visitorteam_id } = fixtureInfo;
        p.player_id,
        p.team_id,
        pl.fullname,
-       p.last_known_points AS points,
+       COALESCE(p.last_known_credit_points, 0) AS credit_points,
+       COALESCE(p.last_known_credit_points, 0) AS points,
        p.position,
        pl.image_path,
        pl.battingstyle,
@@ -198,6 +205,35 @@ const { league_id, localteam_id, visitorteam_id } = fixtureInfo;
   );
   return players;
 };
+
+  const fetchFromPlayersTable = async (teamIds, league_id) => {
+    if (!teamIds || teamIds.length !== 2) return [];
+
+    const [players] = await db.query(
+      `SELECT 
+         pl.player_id,
+         pl.team_id,
+         pl.fullname,
+         NULL AS is_substitute,
+         pl.position,
+         COALESCE(ppc.last_known_credit_points, 0) AS credit_points,
+         COALESCE(ppc.last_known_credit_points, 0) AS points,
+         pl.image_path,
+         pl.battingstyle,
+         pl.bowlingstyle,
+         t.name AS team_name
+       FROM players pl
+       LEFT JOIN player_points_cache ppc
+         ON ppc.player_id = pl.player_id
+        AND ppc.league_id = ?
+       LEFT JOIN teams t ON pl.team_id = t.id
+       WHERE pl.team_id IN (?, ?)
+       ORDER BY pl.team_id, pl.fullname`,
+      [league_id, teamIds[0], teamIds[1]]
+    );
+
+    return players;
+  };
 
 
 
@@ -223,7 +259,37 @@ const { league_id, localteam_id, visitorteam_id } = fixtureInfo;
 
     // 🔄 Fallback to player_point_cache using fixture's teams
     if (!players.length) {
-      console.warn('[getPlayers] Still no players in 22_match_players. Checking fallback from player_point_cache...');
+      console.warn('[getPlayers] Still no players in 22_match_players. Checking fallback from players table...');
+
+      const teamIds = [localteam_id, visitorteam_id];
+      console.log(`[getPlayers] Squad fallback using team_ids: ${localteam_id}, ${visitorteam_id}`);
+
+      players = await fetchFromPlayersTable(teamIds, league_id);
+      console.log(`[getPlayers] Found ${players.length} players in players table for squad fallback`);
+
+      if (!players.length) {
+        try {
+          console.log(`[getPlayers] Players table empty. Calling savePlayersForFixture for match_id ${match_id}`);
+          await savePlayersForFixture(match_id);
+        } catch (squadErr) {
+          console.error('[getPlayers] Error inside savePlayersForFixture:', squadErr.message);
+        }
+
+        players = await fetchFromPlayersTable(teamIds, league_id);
+        console.log(`[getPlayers] Fetched ${players.length} players from players table after squad save`);
+      }
+
+      if (players.length) {
+        lineupStatus = 'squad';
+        players = players.map(p => ({
+          ...p,
+          played_last_match: false
+        }));
+      }
+    }
+
+    if (!players.length) {
+      console.warn('[getPlayers] Still no players in players table. Checking fallback from player_point_cache...');
 
       // Get localteam and visitorteam IDs
       const [fixtureRows] = await db.query(
@@ -243,7 +309,7 @@ const { league_id, localteam_id, visitorteam_id } = fixtureInfo;
       console.log(`[getPlayers] Found ${players.length} players in player_point_cache for fallback`);
 
       if (!players.length) {
-        return res.status(404).json({ message: 'No data available in 22_match_players or fallback cache.' });
+        return res.status(404).json({ message: 'No data available in 22_match_players, players table, or fallback cache.' });
       }
 
       lineupStatus = 'fallback';
@@ -269,7 +335,8 @@ const { league_id, localteam_id, visitorteam_id } = fixtureInfo;
         fullname: p.fullname,
         is_substitute: p.is_substitute,
         position: p.position,
-        points: p.points,
+        credit_points: p.credit_points,
+        points: p.credit_points,
         image_path: p.image_path,
         battingstyle: p.battingstyle,
         bowlingstyle: p.bowlingstyle,

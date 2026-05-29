@@ -82,7 +82,7 @@ const UserTeamsPage = () => {
 
               <p>
                 Contest: {team.contest?.match_title || 'N/A'} — 
-                Amount: ₹{team.contest?.total_fee || '0.00'} <br />
+                Amount: ₹{team.contest?.total_fee || '0'} <br />
                 match id : {team.match?.id }
               </p>
 

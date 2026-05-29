@@ -132,35 +132,97 @@ const db = require('../../../../config/db/db');
 
 
 
-// save the fixtures for last 7 days and next 7 days 
+const yyyyMmDd = d => d.toISOString().slice(0, 10);
 
-const saveFixtures = async (req, res) => {
-  const API_TOKEN = process.env.CRICKET_API_KEY;
+const formatDateForMysql = (dateTimeStr) => {
+  if (!dateTimeStr) return null;
+  const utcDate = new Date(dateTimeStr);
+  const yyyy = utcDate.getFullYear();
+  const mm = String(utcDate.getMonth() + 1).padStart(2, '0');
+  const dd = String(utcDate.getDate()).padStart(2, '0');
+  const hh = String(utcDate.getHours()).padStart(2, '0');
+  const min = String(utcDate.getMinutes()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+};
+
+const saveTeamFromFixture = async (team) => {
+  if (!team?.id) return;
+
+  await db.query(
+    `INSERT INTO teams (id, name, code, image_path, country_id, national_team, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+       name = VALUES(name),
+       code = VALUES(code),
+       image_path = VALUES(image_path),
+       country_id = VALUES(country_id),
+       national_team = VALUES(national_team),
+       updated_at = VALUES(updated_at)`,
+    [
+      team.id,
+      team.name || null,
+      team.code || null,
+      team.image_path || null,
+      team.country_id || null,
+      team.national_team ? 1 : 0,
+      team.updated_at ? formatDateForMysql(team.updated_at) : null,
+    ]
+  );
+};
+
+const buildFixtureUrls = ({ includeFinished, includeUpcoming, pastMonths, upcomingMonths, upcomingDays }) => {
+  const API_TOKEN = (process.env.CRICKET_API_KEY || '').trim();
   const BASE_URL = "https://cricket.sportmonks.com/api/v2.0/fixtures";
 
   const today = new Date();
 
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(today.getDate() - 7);
-
-  const sevenDaysLater = new Date();
-  sevenDaysLater.setDate(today.getDate() + 7);
-
-  const yyyyMmDd = d => d.toISOString().slice(0, 10);
   const todayStr = yyyyMmDd(today);
-  const sevenDaysAgoStr = yyyyMmDd(sevenDaysAgo);
-  const sevenDaysLaterStr = yyyyMmDd(sevenDaysLater);
 
-  const urls = [
-    {
+  const urls = [];
+
+  if (includeFinished) {
+    const pastDate = new Date(today);
+    pastDate.setMonth(today.getMonth() - pastMonths);
+
+    urls.push({
       type: "Finished",
-      url: `${BASE_URL}/?api_token=${API_TOKEN}&filter[status]=Finished&filter[starts_between]=${sevenDaysAgoStr},${todayStr}&include=localteam,visitorteam&sort=starting_at&per_page=100`
-    },
-    {
-      type: "NS",
-      url: `${BASE_URL}/?api_token=${API_TOKEN}&filter[status]=NS&filter[starts_between]=${todayStr},${sevenDaysLaterStr}&include=localteam,visitorteam&sort=starting_at&per_page=100`
+      url: `${BASE_URL}/?api_token=${API_TOKEN}&filter[status]=Finished&filter[starts_between]=${yyyyMmDd(pastDate)},${todayStr}&include=localteam,visitorteam&sort=starting_at&per_page=100`
+    });
+  }
+
+  if (includeUpcoming) {
+    const futureDate = new Date(today);
+    if (upcomingDays) {
+      futureDate.setDate(today.getDate() + upcomingDays);
+    } else {
+      futureDate.setMonth(today.getMonth() + upcomingMonths);
     }
-  ];
+
+    urls.push({
+      type: "NS",
+      url: `${BASE_URL}/?api_token=${API_TOKEN}&filter[status]=NS&filter[starts_between]=${todayStr},${yyyyMmDd(futureDate)}&include=localteam,visitorteam&sort=starting_at&per_page=100`
+    });
+  }
+
+  return urls;
+};
+
+const saveFixturesService = async (options = {}) => {
+  const {
+    includeFinished = true,
+    includeUpcoming = true,
+    pastMonths = 1,
+    upcomingMonths = 4,
+    upcomingDays = null,
+  } = options;
+
+  const urls = buildFixtureUrls({
+    includeFinished,
+    includeUpcoming,
+    pastMonths,
+    upcomingMonths,
+    upcomingDays,
+  });
 
   let savedCount = 0;
 
@@ -171,13 +233,10 @@ const saveFixtures = async (req, res) => {
       const fixtures = response.data?.data || [];
 
       for (const fixture of fixtures) {
-      const utcDate = new Date(fixture.starting_at);
-const yyyy = utcDate.getFullYear();
-const mm = String(utcDate.getMonth() + 1).padStart(2, '0');
-const dd = String(utcDate.getDate()).padStart(2, '0');
-const hh = String(utcDate.getHours()).padStart(2, '0');
-const min = String(utcDate.getMinutes()).padStart(2, '0');
-const startingAtIST = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        await saveTeamFromFixture(fixture.localteam);
+        await saveTeamFromFixture(fixture.visitorteam);
+
+        const startingAtIST = formatDateForMysql(fixture.starting_at);
 
         const values = [
            fixture.id,
@@ -189,6 +248,7 @@ const startingAtIST = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
   fixture.visitorteam_id,
   startingAtIST,
   fixture.type,
+  fixture.live ? 1 : 0,
   fixture.status,
   fixture.note,
   fixture.draw_noresult,
@@ -199,13 +259,14 @@ const startingAtIST = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
         await db.query(`
           INSERT INTO fixtures (
            id, league_id, season_id, stage_id, round,
-  localteam_id, visitorteam_id, starting_at, type, status,
+  localteam_id, visitorteam_id, starting_at, type, live, status,
   note, draw_noresult, super_over, is_activated
           ) VALUES (
-          ?,?,?,?,?,?,?,?,?,?,?,?,?,?
+          ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
           )
           ON DUPLICATE KEY UPDATE
            starting_at = VALUES(starting_at),
+    live = VALUES(live),
     status = VALUES(status),
     note = VALUES(note),
     draw_noresult = VALUES(draw_noresult),
@@ -218,7 +279,7 @@ const startingAtIST = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
     }
 
     console.log(`[INFO] Total fixtures saved/updated: ${savedCount}`);
-    res.json({ message: `${savedCount} fixtures saved/updated in fixtures` });
+    return { savedCount, message: `${savedCount} fixtures saved/updated in fixtures` };
   } catch (err) {
     console.error('[ERROR] Failed to fetch or save fixtures');
     if (err.sqlMessage) {
@@ -228,8 +289,20 @@ const startingAtIST = `${yyyy}-${mm}-${dd} ${hh}:${min}`;
     } else {
       console.error('[OTHER ERROR]', err.message);
     }
+    throw err;
+  }
+};
+
+// save the fixtures for last 1 month and next 4 months
+
+const saveFixtures = async (req, res) => {
+  try {
+    const result = await saveFixturesService();
+    res.json({ message: result.message });
+  } catch (err) {
     res.status(500).json({ error: 'Failed to fetch or save fixtures' });
   }
 };
 
 module.exports = saveFixtures;
+module.exports.saveFixturesService = saveFixturesService;
