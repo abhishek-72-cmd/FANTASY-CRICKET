@@ -101,8 +101,6 @@ const db = require('../../../config/db/db');
 
 
 
-
-
 const save22PlayersService = async (match_id) => {
   const API_TOKEN = process.env.CRICKET_API_KEY;
   const url = `https://cricket.sportmonks.com/api/v2.0/fixtures/${match_id}?include=lineup,localteam,visitorteam&api_token=${API_TOKEN}`;

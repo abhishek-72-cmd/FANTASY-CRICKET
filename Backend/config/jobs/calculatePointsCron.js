@@ -14,6 +14,7 @@ const db = require('../db/db');
 cron.schedule(' 30 3 * * * ', async () => { 
   console.log(`🕒 Running Points Calculation Cron at ${new Date().toISOString()}`);
 
+  
   try {
     const [matches] = await db.query(`
       SELECT f.id

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../styling/AdminAuth.css'; // Create this CSS file
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const AdminRegister = () => {
   const [formData, setFormData] = useState({
@@ -13,12 +13,15 @@ const AdminRegister = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+   const navigate = useNavigate();
+
+
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5000/api/admin/auth/register', formData);
       setMessage(res.data.message);
-      Navigate('/admin/login')
+      navigate('/admin/login')
     } catch (err) {
       setMessage(err.response?.data?.message || 'Registration failed');
     }

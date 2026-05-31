@@ -5,7 +5,7 @@ const {fetchMatchEventsForMatch } =  require('../../controllers/admin/matches/ev
 
 
 
-// this fetch the matches whoes  status is finished and fetches the fixtures for last 6 days for the finished matches 
+// this fetch the matches whoes status is finished and fetches the fixtures for last 6 days for the finished matches 
 
 // cron: runs at 3am & 3pm server time  '0 3,15 * * *
 
