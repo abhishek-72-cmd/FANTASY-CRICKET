@@ -8,7 +8,7 @@ const checkAdmin = require('../../middlewares/checkAdmin');
 // for user
 router.post('/register', authController.register);
 router.post('/login', authController.login);
-router.post('/forgot-password', authController.forgotPassword);
+router.post('/google-login', authController.googleLogin);
 
 
 

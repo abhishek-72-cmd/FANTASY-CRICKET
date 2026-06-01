@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/UserAuth.css'; // Same CSS file as above
-
+import { GoogleLogin } from '@react-oauth/google';
 
 const UserLogin = () => {
   const [formData, setFormData] = useState({ email: 'dummyuser@gmail.com', password: 'dummy@123' });
@@ -57,6 +57,33 @@ const UserLogin = () => {
           Don't have an account? <a href="/user/register">Register here</a>
         </div>
       </div>
+
+
+
+      <GoogleLogin
+  onSuccess={async credentialResponse => {
+
+    const res = await axios.post(
+      'http://localhost:5000/api/user/auth/google-login',
+      {
+        credential:
+          credentialResponse.credential
+      }
+    );
+
+    localStorage.setItem(
+      'userToken',
+      res.data.token
+    );
+
+    window.location.href='/user/matches';
+  }}
+
+  onError={() => {
+    alert('Google Login Failed');
+  }}
+/>
+
     </div>
   );
 };

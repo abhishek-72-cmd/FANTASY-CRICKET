@@ -1,9 +1,14 @@
-// controllers/authController.js
-
+require('dotenv').config();
 const db = require("../../../config/db/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {OAuth2Client} = require ('google-auth-library');
 
+
+ const googleClient = new OAuth2Client((
+  process.env.GOOGLE_CLIENT_ID
+)
+ )
 
 // Common validation patterns
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -127,21 +132,95 @@ exports.login = async (req, res, next) => {
   }
 };
 
+exports.googleLogin = async (req, res) => {
+  try {
 
-exports.forgotPassword = async (req,res,next) =>{
-    const {email} = req.body;
-    
-    try{
+    const { credential } = req.body;
 
-    const [rows] = await db.query ('SELECT * FROM users WHERE email=?', [email]);
-    if (rows.length===0) return res.status (404).json({Message: 'User not found'}) 
-
-
-//otp system
-
-   res.json({Message: 'OTP is shared to the mail (to be implimented)'})
-
-    } catch (err){
-        next(err)
+    if (!credential) {
+      return res.status(400).json({
+        message: 'Google credential missing'
+      });
     }
-}
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+
+    const googleId = payload.sub;
+    const email = payload.email;
+    const name = payload.name;
+
+    let [users] = await db.query(
+      'SELECT * FROM users WHERE email = ?',
+      [email]
+    );
+
+    let user;
+
+    if (users.length === 0) {
+
+      const [result] = await db.query(
+        `INSERT INTO users
+        (name,email,google_id,auth_provider,is_verified)
+        VALUES (?,?,?,?,?)`,
+        [
+          name,
+          email,
+          googleId,
+          'google',
+          1
+        ]
+      );
+
+      user = {
+        id: result.insertId,
+        name,
+        email
+      };
+
+    } else {
+
+      user = users[0];
+
+      if (!user.google_id) {
+
+        await db.query(
+          `UPDATE users
+           SET google_id=?,
+               auth_provider='google',
+               is_verified=1
+           WHERE id=?`,
+          [googleId, user.id]
+        );
+      }
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user.id
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '7d'
+      }
+    );
+
+    return res.json({
+      success: true,
+      token,
+      user
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    return res.status(500).json({
+      message: 'Google login failed'
+    });
+  }
+};
+
