@@ -390,6 +390,7 @@ const ViewSquad = () => {
             </svg>
             {saving ? 'Saving…' : 'Save Credit Points'}
           </button>
+
         </div>
       )}
 

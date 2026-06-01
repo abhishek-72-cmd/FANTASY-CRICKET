@@ -199,6 +199,7 @@ const AdminMatches = () => {
   const [toasts, setToasts] = useState([]);
   const [syncing, setSyncing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+const [activeCount, setActiveCount] = useState(0);
 
   const addToast = useCallback((msg, type = 'success') => {
     const id = Date.now();
@@ -229,7 +230,18 @@ const AdminMatches = () => {
     }
   }, []);
 
-  useEffect(() => { fetchFixtures(); }, [fetchFixtures]);
+  const fetchActiveCount = useCallback(async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/admin/activation/active-count');
+    if (response.data.success) {
+      setActiveCount(response.data.activeCount);
+    }
+  } catch (err) {
+    console.error('ACTIVE COUNT ERROR:', err);
+  }
+}, []);
+
+  useEffect(() => { fetchFixtures(); fetchActiveCount(); }, [fetchFixtures, fetchActiveCount]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -342,8 +354,8 @@ const AdminMatches = () => {
         {/* page header */}
         <div className="am-page-header">
           <div>
-            <div className="am-page-title">Upcoming <span>Matches</span></div>
-            <div className="am-page-subtitle">{fixtures.length} fixtures loaded · Admin panel</div>
+            <div className="am-page-title">Active contests <span>Matches</span></div>
+            <div className="am-page-subtitle">{activeCount} active fixtures · Admin panel</div>
           </div>
         </div>
 

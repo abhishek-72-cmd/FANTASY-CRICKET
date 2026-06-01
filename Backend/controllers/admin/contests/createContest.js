@@ -53,4 +53,4 @@ createContest = async (req, res, next) => {
   }
 };
 
-module.exports = createContest
+module.exports = createContest;
