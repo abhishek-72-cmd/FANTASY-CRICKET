@@ -23,7 +23,7 @@ const UserTeamsPage = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/user/team/my_teams', {
+        const response = await axios.get('(http://localhost:5000/api/user/team/my_teams)', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
