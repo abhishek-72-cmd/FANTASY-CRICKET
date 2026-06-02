@@ -13,13 +13,5 @@ const pool = mysql.createPool({
 })
 
 
-pool.getConnection ((err,connection)=>{
-    if(err){
-        console.log (`MySQL connection failed`, err.message)
-    } else {
-        console.log (`MySQL connection successful`)
-         connection.release();
-    }
-})
 
 module.exports = pool.promise();

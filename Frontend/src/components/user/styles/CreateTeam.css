@@ -1,168 +1,660 @@
+/* ============================================================
+   CreateTeam.css — Stadium Night Theme
+   Fantasy Cricket | Sporty Dark UI
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap');
+
+/* ── Root Variables ── */
+:root {
+  --bg-base: #080c10;
+  --bg-card: #0f1520;
+  --bg-card-hover: #141d2e;
+  --bg-panel: #0b1018;
+  --border: #1e2d42;
+  --border-accent: #2a4060;
+
+  --green-pitch: #00e676;
+  --green-dim: #00b35c;
+  --gold: #ffd600;
+  --gold-dim: #c9a800;
+  --red-accent: #ff4444;
+  --blue-accent: #2979ff;
+
+  --text-primary: #e8f0fe;
+  --text-secondary: #7a9bbf;
+  --text-muted: #3d5a7a;
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-ui: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --transition: 0.18s ease;
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.5);
+  --glow-green: 0 0 16px rgba(0,230,118,0.25);
+  --glow-gold: 0 0 16px rgba(255,214,0,0.3);
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  font-family: Arial;
-  margin: 20px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
 }
 
-.container {
+/* ── Page Wrapper ── */
+.ctb-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  position: relative;
+}
+
+/* ── Stadium BG texture ── */
+.ctb-wrapper::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,100,40,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(0,80,160,0.08) 0%, transparent 60%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 59px,
+      rgba(255,255,255,0.015) 59px,
+      rgba(255,255,255,0.015) 60px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ctb-wrapper > * { position: relative; z-index: 1; }
+
+/* ── Header ── */
+.ctb-header {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.ctb-header-top {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
 }
 
-.column {
-  width: 230px;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 14px;
-  font-weight: 100;
+.ctb-page-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 4px;
+  color: var(--green-pitch);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
 }
 
+.ctb-match-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  line-height: 1;
+}
 
-    .column-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #eaeaea;
-      padding: 5px 10px;
-      font-weight: bold;
-    }
+.ctb-meta {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-    .role-group {
-      background: #fff;
-      margin-bottom: 10px;
-      padding: 5px;
-      min-height: 40px;
-      border: 1px dashed #aaa;
-    }
+.ctb-meta-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
 
-    .role-group strong {
-      display: block;
-      margin-bottom: 5px;
-    }
+.ctb-meta-badge .icon { font-size: 1rem; }
+.ctb-meta-badge.gold { color: var(--gold); border-color: rgba(255,214,0,0.3); }
 
-    .user {
-      display: flex;
-      align-items: center;
-      padding: 6px;
-      background-color: #e3e3ff;
-      border: 1px solid #999;
-      border-radius: 5px;
-      margin: 5px 0;
-      cursor: move;
-      user-select: none;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
+/* ── Credits Bar ── */
+.ctb-credits-bar-wrap {
+  margin-bottom: 1.5rem;
+}
 
-    .player-img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #ccc;
-    }
+.ctb-credits-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
 
-    .player-info {
-      display: flex;
-      flex-direction: column;
-    }
+.ctb-credits-value { color: var(--text-primary); font-size: 1rem; }
 
-    .player-name {
-      font-weight: 500;
-      font-size: 14px;
-    }
+.ctb-credits-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
 
-    .player-meta {
-      font-size: 12px;
-      color: #555;
-      font-weight: 100;
-      font-style: italic;
-      margin-top: 4px;
-      margin-left: 20px;
-    }
+.ctb-credits-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--green-pitch), var(--gold));
+  transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 10px rgba(0,230,118,0.5);
+}
 
-    .role-icon {
-      width: 16px;
-      height: 16px;
-      vertical-align: middle;
-      margin-right: 4px;
-    }
+.ctb-credits-fill.warning { background: linear-gradient(90deg, var(--gold), var(--red-accent)); }
 
+/* ── Squad Warning Banner ── */
+.ctb-squad-warning {
+  background: linear-gradient(90deg, rgba(255,152,0,0.15), rgba(255,152,0,0.05));
+  border: 1px solid rgba(255,152,0,0.4);
+  border-left: 4px solid #ff9800;
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffb74d;
+  letter-spacing: 0.3px;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-    /* Role-based coloring */
-    .user[data-role="Captain"] {
-      background-color: #ffe4e1;
-    }
+/* ── 3-Column Main Layout ── */
+.ctb-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
 
-    .user[data-role="Vice Captain"] {
-      background-color: #f5e1ff;
-    }
+@media (max-width: 1024px) {
+  .ctb-main { grid-template-columns: 1fr 1fr; }
+  .ctb-panel--yours { grid-column: 1 / -1; }
+}
 
-    .user[data-role="Wicket Keeper"] {
-      background-color: #e0fff1;
-    }
+@media (max-width: 640px) {
+  .ctb-main { grid-template-columns: 1fr; }
+  .ctb-panel--yours { grid-column: auto; }
+}
 
-    .user[data-role="Batsman"] {
-      background-color: #e6f7ff;
-    }
+/* ── Panel ── */
+.ctb-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
 
-    .user[data-role="Bowler"] {
-      background-color: #f0f0f0;
-    }
+.ctb-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
 
-    .user[data-role="All Rounder"] {
-      background-color: #fff5d1;
-    }
+.ctb-panel-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-    /* Compact Mode */
-    .user.compact .player-meta {
-      display: none;
-    }
+.ctb-panel-title .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green-pitch);
+  box-shadow: var(--glow-green);
+}
 
-    .user.compact .player-name {
-      font-size: 13px;
-    }
+.ctb-panel-count {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.2rem 0.6rem;
+}
 
+.ctb-panel-body {
+  padding: 0.75rem;
+  max-height: 580px;
+  overflow-y: auto;
+}
 
-    .delete-btn {
-      background: red;
-      color: white;
-      border: none;
-      cursor: pointer;
-      padding: 2px 5px;
-      font-size: 12px;
-      margin-left: 10px;
-    }
+.ctb-panel-body::-webkit-scrollbar { width: 4px; }
+.ctb-panel-body::-webkit-scrollbar-track { background: transparent; }
+.ctb-panel-body::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 4px; }
 
-    .points-summary {
-      font-weight: normal;
-      font-size: 14px;
-      color: #444;
-    }
+/* ── Role Section in Pool ── */
+.ctb-role-section { margin-bottom: 1rem; }
 
-    .accordion {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      background: #fafafa;
-    }
+.ctb-role-label {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.4rem;
+  border-left: 2px solid var(--border-accent);
+}
 
-    .accordion-header {
-      background: #ddd;
-      padding: 8px 10px;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-    }
+/* ── Player Card (Pool) ── */
+.ctb-player-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  margin-bottom: 0.35rem;
+  position: relative;
+}
 
-    .accordion-body {
-      overflow: hidden;
-      transition: height 0.3s ease;
-      height: auto;
-      /* will be controlled via JS */
-    }
+.ctb-player-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-accent);
+  transform: translateX(3px);
+}
 
-/* …copy the rest of your CSS here exactly as in the <style>… */
+.ctb-player-card.selected {
+  background: rgba(0,230,118,0.06);
+  border-color: rgba(0,230,118,0.25);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.ctb-player-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a2d44, #0f1a28);
+  border: 1.5px solid var(--border-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--green-pitch);
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+
+.ctb-player-info { flex: 1; min-width: 0; }
+
+.ctb-player-name {
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.2px;
+}
+
+.ctb-player-role-tag {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.ctb-player-credits {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--gold);
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.ctb-add-btn {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--green-pitch);
+  background: transparent;
+  color: var(--green-pitch);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.ctb-add-btn:hover {
+  background: var(--green-pitch);
+  color: #000;
+  box-shadow: var(--glow-green);
+  transform: scale(1.1);
+}
+
+.ctb-add-btn:disabled,
+.ctb-player-card.selected .ctb-add-btn {
+  border-color: var(--text-muted);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ── Your Team Panel ── */
+.ctb-panel--yours .ctb-panel-title .dot { background: var(--gold); box-shadow: var(--glow-gold); }
+
+/* Role slot in your team */
+.ctb-slot-group { margin-bottom: 1rem; }
+
+.ctb-slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.ctb-slot-label {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ctb-slot-limit {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ctb-slot-empty {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Selected player in your team */
+.ctb-selected-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-accent);
+  background: rgba(255,255,255,0.025);
+  margin-bottom: 0.35rem;
+  transition: background var(--transition);
+  position: relative;
+}
+
+.ctb-selected-card:hover { background: rgba(255,255,255,0.04); }
+
+.ctb-selected-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a2d44, #0f1a28);
+  border: 1.5px solid var(--border-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--green-pitch);
+  flex-shrink: 0;
+}
+
+.ctb-selected-info { flex: 1; min-width: 0; }
+
+.ctb-selected-name {
+  font-family: var(--font-ui);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.ctb-selected-credits {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* C/VC badge */
+.ctb-role-badge {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.ctb-role-badge.captain {
+  background: rgba(255,214,0,0.15);
+  color: var(--gold);
+  border: 1px solid rgba(255,214,0,0.4);
+}
+
+.ctb-role-badge.vc {
+  background: rgba(41,121,255,0.12);
+  color: var(--blue-accent);
+  border: 1px solid rgba(41,121,255,0.3);
+}
+
+.ctb-remove-btn {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--red-accent);
+  background: transparent;
+  color: var(--red-accent);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.ctb-remove-btn:hover {
+  background: var(--red-accent);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* ── C / VC Selection ── */
+.ctb-captain-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.ctb-captain-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.ctb-select-wrap { margin-bottom: 0.65rem; }
+
+.ctb-select-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+.ctb-select-label .badge-c {
+  display: inline-block;
+  background: var(--gold);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+
+.ctb-select-label .badge-vc {
+  display: inline-block;
+  background: var(--blue-accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+
+.ctb-select {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 0.55rem 0.8rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a9bbf' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.ctb-select:focus { border-color: var(--green-pitch); box-shadow: 0 0 0 2px rgba(0,230,118,0.12); }
+
+/* ── Counter Pill ── */
+.ctb-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  margin-bottom: 1.5rem;
+}
+
+.ctb-counter-num { color: var(--green-pitch); }
+.ctb-counter-sep { color: var(--text-muted); }
+.ctb-counter-max { color: var(--text-muted); }
+.ctb-counter-label { font-family: var(--font-ui); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; margin-left: 0.25rem; }
+
+/* ── Action Buttons ── */
+.ctb-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.ctb-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border: none;
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+  text-transform: uppercase;
+}
+
+.ctb-btn:active { transform: scale(0.97); }
+
+.ctb-btn--primary {
+  background: linear-gradient(135deg, var(--green-pitch), var(--green-dim));
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(0,230,118,0.3);
+}
+
+.ctb-btn--primary:hover {
+  box-shadow: 0 6px 28px rgba(0,230,118,0.5);
+  transform: translateY(-1px);
+}
+
+.ctb-btn--secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-accent);
+}
+
+.ctb-btn--secondary:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.03);
+}
+
+/* ── Animations ── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ctb-player-card,
+.ctb-selected-card {
+  animation: fadeSlideIn 0.2s ease both;
+}
+
+/* ── Scrollbar for webkit ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-accent) transparent;
+}

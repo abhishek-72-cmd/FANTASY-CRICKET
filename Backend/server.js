@@ -2,7 +2,7 @@ const express = require ('express');
 const dotenv = require('dotenv');
  const bodyParser = require('body-parser');
  const cors = require('cors');
-
+const pool = require('./config/db/db.js')
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,8 +33,38 @@ app.use('/api/user', userRoutes)
 
 app.use(errorHandler);
 
+async function connectDB(retries = 3) {
+    while (retries > 0) {
+        try {
+            await pool.query('SELECT 1');
+            console.log('MySQL Connected');
+            return true;
+        } catch (err) {
+            console.log(
+                `DB connection failed. Retrying in 1 second... (${retries} left)`
+            );
+            retries--;
+            await new Promise(resolve =>
+                setTimeout(resolve, 1000)
+            );
+        }
+    }
+
+    throw new Error('Unable to connect to DB');
+}
 
 
-app.listen (PORT , ()=>{
-  console.log (`app is running on http://localhost:${PORT}`)
-})
+(async () => {
+  try {
+    await connectDB(3);
+
+    app.listen(PORT, () => {
+      console.log(`app is running on http://localhost:${PORT}`);
+    });
+
+  } catch (err) {
+    console.error('Failed to connect to DB after multiple attempts:', err);
+    process.exit(1);
+  }
+})();
+
