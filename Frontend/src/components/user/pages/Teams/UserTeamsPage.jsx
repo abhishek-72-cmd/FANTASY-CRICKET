@@ -28,8 +28,12 @@ const UserTeamsPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setTeams(response.data.teams || []);
-        console.log('Fetched teams:', response.data.teams);
+
+        const fetchedTeams = response.data.teams || [];
+        setTeams(fetchedTeams);
+        console.log('Fetched teams:', fetchedTeams);
+        console.log('Match IDs:', fetchedTeams.map(team => team.match?.id));
+        console.log('First match id:', fetchedTeams[0]?.match?.id);
       } catch (err) {
         console.error('Error fetching teams:', err);
         setError(err.response?.data?.message || 'Failed to fetch teams');
@@ -51,6 +55,20 @@ const UserTeamsPage = () => {
 
   const handleDeleteContest = (teamId) => {
     navigate(`/user/deleteteams/${teamId}`);
+  };
+
+
+  const handleHomeclick = ()=>{
+    navigate('/user/matches')
+  }
+
+  const handleCreateTeam = () => {
+    const matchId = teams[0]?.match?.id;
+    if (matchId) {
+      navigate(`/user/create_team/${matchId}`);
+    } else {
+      console.log('Match ID not found');
+    }
   };
 
   if (loading) {
@@ -103,7 +121,7 @@ const UserTeamsPage = () => {
         <div className="utp-header-actions">
           <button
             className="btn btn-outline"
-            onClick={() => navigate('/matches')}
+            onClick={handleCreateTeam}
           >
             + Create a Team
           </button>
@@ -112,7 +130,9 @@ const UserTeamsPage = () => {
 
       <div className="utp-subheader">
         <div className="utp-breadcrumbs">
-          <span className="crumb">Home</span>
+          <span className="crumb" onClick={handleHomeclick}>
+            Home
+          </span>
           <span className="crumb-sep">/</span>
           <span className="crumb active">Your Teams</span>
         </div>
@@ -132,7 +152,7 @@ const UserTeamsPage = () => {
               <div className="ball" />
             </div>
             <p className="no-teams-text">You haven't created any teams yet.</p>
-            <button className="btn btn-primary" onClick={() => navigate('/matches')}>
+            <button className="btn btn-primary" onClick={handleCreateTeam}>
               Create a Team
             </button>
           </div>
