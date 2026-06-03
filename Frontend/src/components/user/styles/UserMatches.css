@@ -13,6 +13,28 @@
   font-size: 2rem;
 }
 
+.wallet-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.wallet-chip:hover {
+  transform: translateY(-1px);
+}
+
+.wallet-chip svg {
+  color: #f59e0b;
+}
+
 /* Grid layout */
 .fixtures-grid {
   display: grid;

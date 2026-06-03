@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import ('../../styles/UserMatches.css')
 import { useNavigate } from 'react-router-dom';
 
@@ -54,6 +55,22 @@ const Icon = {
       <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
     </svg>
   ),
+  Coin: () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ width: 14, height: 14 }}
+  >
+    <circle cx="12" cy="12" r="8" />
+    <path d="M12 8v8" />
+    <path d="M9 10.5c0-1.2 1.3-2 3-2s3 .8 3 2-1.3 2-3 2-3 .8-3 2 1.3 2 3 2 3-.8 3-2" />
+  </svg>
+),
+
 };
 
 /* ─── helpers ─── */
@@ -205,7 +222,7 @@ const AdminMatches = () => {
   const [syncing, setSyncing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 const [activeCount, setActiveCount] = useState(0);
-
+const [walletBalance, setWalletBalance] = useState(0);
 
   const addToast = useCallback((msg, type = 'success') => {
     const id = Date.now();
@@ -247,7 +264,37 @@ const [activeCount, setActiveCount] = useState(0);
   }
 }, []);
 
+const fetchBalance = useCallback(async () => {
+  try {
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+
+    const decoded = jwtDecode(token);
+    const userId = decoded.userId;
+    if (!userId) return;
+
+    const res = await axios.get(
+      `http://localhost:5000/api/user/wallet/getWalletBalance/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (res.data.success) {
+      setWalletBalance(res.data.balance);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}, []);
+
   useEffect(() => { fetchFixtures(); fetchActiveCount(); }, [fetchFixtures, fetchActiveCount]);
+
+  useEffect(() => {
+    fetchBalance();
+  }, [fetchBalance]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -346,6 +393,8 @@ const [activeCount, setActiveCount] = useState(0);
         onLogout={handleLogout}
         syncing={syncing}
         refreshing={refreshing}
+        walletBalance={walletBalance}
+        onFetchBalance={fetchBalance}
       />
 
       {/* ticker */}
@@ -361,7 +410,7 @@ const [activeCount, setActiveCount] = useState(0);
         <div className="am-page-header">
           <div>
             <div className="am-page-title">Upcoming <span>Active</span></div>
-            <div className="am-page-subtitle">{activeCount} active fixtures · Admin panel</div>
+            <div className="am-page-subtitle">{activeCount} active fixtures · user panel</div>
           </div>
         </div>
 
@@ -428,7 +477,7 @@ const [activeCount, setActiveCount] = useState(0);
 };
 
 /* ─── Topbar extracted for reuse in loading/error states ─── */
-const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing }) => (
+const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing, walletBalance = 0, onFetchBalance }) => (
   <nav className="am-topbar">
     <div className="am-brand">
       <div className="am-brand-icon">
@@ -443,6 +492,16 @@ const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing }) => (
       <button className="btn btn-ghost" onClick={onSync} disabled={syncing}>
         <Icon.Sync /> {syncing ? 'Syncing…' : 'Sync'}
       </button>
+
+
+   <div className="wallet-chip" onClick={onFetchBalance} title="Wallet Balance">
+        <Icon.Coin />
+        <span>₹{Number(walletBalance || 0).toFixed(2)}</span>
+      </div>
+
+
+
+
       <button className="btn btn-ghost" onClick={onRefresh} disabled={refreshing}>
         <Icon.Refresh /> {refreshing ? 'Refreshing…' : 'Refresh'}
       </button>

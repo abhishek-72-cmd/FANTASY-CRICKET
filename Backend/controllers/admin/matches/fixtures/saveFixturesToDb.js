@@ -239,21 +239,21 @@ const saveFixturesService = async (options = {}) => {
         const startingAtIST = formatDateForMysql(fixture.starting_at);
 
         const values = [
-           fixture.id,
-  fixture.league_id,
-  fixture.season_id,
-  fixture.stage_id,
-  fixture.round,
-  fixture.localteam_id,
-  fixture.visitorteam_id,
-  startingAtIST,
-  fixture.type,
-  fixture.live ? 1 : 0,
-  fixture.status,
-  fixture.note,
-  fixture.draw_noresult,
-  fixture.super_over ? 1 : 0,
-  0 // default value for is_activated
+          fixture.id,
+          fixture.league_id,
+          fixture.season_id,
+          fixture.stage_id,
+          fixture.round,
+          fixture.localteam_id,
+          fixture.visitorteam_id,
+          startingAtIST,
+          fixture.type,
+          fixture.live ? 1 : 0,
+          fixture.status,
+          fixture.note,
+          fixture.draw_noresult,
+          fixture.super_over ? 1 : 0,
+          0 // default value for is_activated
         ];
 
         await db.query(`

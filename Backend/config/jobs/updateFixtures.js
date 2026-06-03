@@ -14,7 +14,7 @@ cron.schedule('0 2 * * *', async () => {
     const result = await saveFixturesService({
       includeFinished: false,
       includeUpcoming: true,
-      upcomingDays: 7,
+      upcomingDays: 14,
     });
     console.log(`[SUCCESS] Fixtures cron result: ${result.message}`);
   } catch (err) {
