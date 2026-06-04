@@ -1,4 +1,4 @@
-const pool = require('../../config/db/db');
+const pool = require('../config/db/db');
 
 const createWallet = async (userId, joiningBonus = 100) => {
     const connection = await pool.getConnection();
