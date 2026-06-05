@@ -1,0 +1,113 @@
+@import "./ViewContest.css";
+
+.edit-contest-container {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--tp);
+  padding: 2rem 1.5rem 5rem;
+}
+
+.edit-contest-container h2 {
+  max-width: 860px;
+  margin: 0 auto 1.25rem;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--tp);
+}
+
+.edit-contest-form {
+  max-width: 860px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.edit-contest-form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--tm);
+  font-weight: 700;
+}
+
+.form-group input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--tp);
+  padding: 10px 12px;
+  font: 500 14px var(--font-body);
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.form-group input:focus {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 0 3px rgba(0,214,143,.12);
+}
+
+.form-group input::placeholder {
+  color: var(--tm);
+}
+
+.update-button {
+  grid-column: 1 / -1;
+  justify-self: end;
+  min-height: 42px;
+  border: none;
+  border-radius: 10px;
+  background: var(--green);
+  color: #030f09;
+  padding: 0 22px;
+  cursor: pointer;
+  font: 700 14px var(--font-body);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.update-button:hover {
+  background: #00f0a0;
+  box-shadow: 0 4px 20px rgba(0,214,143,.28);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+  .edit-contest-container {
+    padding: 1.25rem 1rem 4rem;
+  }
+
+  .edit-contest-form {
+    grid-template-columns: 1fr;
+    padding: 1.1rem;
+  }
+
+  .update-button {
+    width: 100%;
+  }
+}

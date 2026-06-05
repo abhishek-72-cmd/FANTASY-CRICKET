@@ -22,7 +22,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body, #root {
-  background: var(--bg);
+  background: black;
   font-family: var(--font-body);
   color: var(--tp);
   min-height: 100vh;

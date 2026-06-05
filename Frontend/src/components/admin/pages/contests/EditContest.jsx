@@ -74,8 +74,26 @@ const EditContest = () => {
     }
   };
 
-  if (loading) return <div>Loading contest details...</div>;
-  if (!form) return <div>Failed to load contest data.</div>;
+  if (loading) {
+    return (
+      <div className="vc-screen">
+        <div className="vc-loading">
+          <div className="vc-spinner" />
+          <div className="vc-loading-text">Loading contest details...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!form) {
+    return (
+      <div className="vc-screen">
+        <div className="vc-not-activated">
+          <div className="vc-na-title">Failed to load contest data.</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="edit-contest-container">
