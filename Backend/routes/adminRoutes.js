@@ -12,7 +12,7 @@ router.use('/fixtures', require('../subRoutes/admin/fixturesRoutes'));
 router.use('/match-events', require('../subRoutes/admin/matchEventRoutes'));
 router.use('/squads', require('../subRoutes/admin/squadRoutes'));
 router.use ('/activation', require('../subRoutes/admin/activationRoutes.js'),)
-
+router.use('/automation', require('../subRoutes/admin/automationRoutes.js'))
 
  
 module.exports = router;

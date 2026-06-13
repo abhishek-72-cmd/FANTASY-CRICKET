@@ -5,6 +5,7 @@ const getFixtures = async (req, res) => {
   try {
     const [fixtures] = await db.query(`SELECT 
     f.*, 
+     f.is_activated AS is_activated,
     lt.name AS localteam_name, 
     lt.code AS localteam_code,
     lt.image_path AS localteam_image,
@@ -21,6 +22,8 @@ ORDER BY f.starting_at ASC`);
       success: true,
       data: fixtures,
     });
+
+    // console.log ('Fetched fixtures: ', fixtures);
   } catch (err) {
     console.error('Error fetching fixtures: ', err.message);
     res.status(500).json({

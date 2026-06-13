@@ -103,9 +103,13 @@ const db = require('../../../config/db/db');
 
 const save22PlayersService = async (match_id) => {
   const API_TOKEN = process.env.CRICKET_API_KEY;
+  if (!API_TOKEN) {
+    throw new Error('CRICKET_API_KEY is missing');
+  }
+
   const url = `https://cricket.sportmonks.com/api/v2.0/fixtures/${match_id}?include=lineup,localteam,visitorteam&api_token=${API_TOKEN}`;
 
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, { timeout: 20000 });
   const lineup = data?.data?.lineup;
   const localteam_id = data?.data?.localteam_id;
   const visitorteam_id = data?.data?.visitorteam_id;
@@ -124,7 +128,7 @@ if (!league_id) throw new Error('league_id missing in fixture');
 
     const playerId = player.id;
     const fullname = player.fullname;
-    const is_substitute = player.lineup?.substitution ? 0 : 1;
+    const is_substitute = player.lineup?.substitution ? 1 : 0;
     const position = player.position?.name || null;
 
     await db.query(
@@ -151,21 +155,30 @@ if (!league_id) throw new Error('league_id missing in fixture');
       ]
     );
 
-    const [metaRows] = await db.query(
-      `SELECT image_path, battingstyle, bowlingstyle FROM players WHERE player_id = ?`,
-      [playerId]
+    const [[meta]] = await db.query(
+      `SELECT
+         p.image_path,
+         p.battingstyle,
+         p.bowlingstyle,
+         ppc.last_known_credit_points
+       FROM players p
+       LEFT JOIN player_points_cache ppc
+         ON ppc.player_id = p.player_id
+        AND ppc.league_id = ?
+       WHERE p.player_id = ?`,
+      [league_id, playerId]
     );
-    const meta = metaRows[0] || {};
 
     await db.query(
       `INSERT INTO 22_match_players
-       (match_id, league_id, player_id, team_id, fullname, is_substitute, position, image_path, battingstyle, bowlingstyle)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       (match_id, league_id, player_id, team_id, fullname, is_substitute, position, credit_points, image_path, battingstyle, bowlingstyle)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          team_id = VALUES(team_id),
          fullname = VALUES(fullname),
          is_substitute = VALUES(is_substitute),
          position = VALUES(position),
+         credit_points = VALUES(credit_points),
          image_path = VALUES(image_path),
          battingstyle = VALUES(battingstyle),
          bowlingstyle = VALUES(bowlingstyle),
@@ -175,9 +188,27 @@ if (!league_id) throw new Error('league_id missing in fixture');
       [
         match_id,league_id, playerId, team_id, fullname,
         is_substitute, position,
-        meta.image_path || null,
-        meta.battingstyle || null,
-        meta.bowlingstyle || null
+        meta?.last_known_credit_points ?? 0,
+        meta?.image_path || null,
+        meta?.battingstyle || null,
+        meta?.bowlingstyle || null
+      ]
+    );
+
+    await db.query(
+      `INSERT INTO player_points_cache
+       (player_id, team_id, league_id, last_known_credit_points, last_known_points, position)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         team_id = VALUES(team_id),
+         position = VALUES(position)`,
+      [
+        playerId,
+        team_id,
+        league_id,
+        meta?.last_known_credit_points ?? 0,
+        meta?.last_known_credit_points ?? 0,
+        position
       ]
     );
 
@@ -186,4 +217,31 @@ if (!league_id) throw new Error('league_id missing in fixture');
   return savedCount;
 };
 
+const save22PlayersHandler = async (req, res) => {
+  const { match_id } = req.params;
+
+  if (!match_id) {
+    return res.status(400).json({ success: false, message: 'match_id is required' });
+  }
+
+  try {
+    const savedCount = await save22PlayersService(match_id);
+    return res.status(200).json({
+      success: true,
+      message: `Saved/updated ${savedCount} final lineup players`,
+      match_id,
+      savedCount
+    });
+  } catch (err) {
+    console.error('save22Players error:', err.response?.data || err.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to save final lineup players',
+      error: err.response?.data?.message || err.message
+    });
+  }
+};
+
 module.exports = save22PlayersService;
+module.exports.save22PlayersService = save22PlayersService;
+module.exports.save22PlayersHandler = save22PlayersHandler;

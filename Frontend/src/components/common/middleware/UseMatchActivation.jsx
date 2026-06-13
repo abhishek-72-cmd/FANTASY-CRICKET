@@ -116,7 +116,7 @@ const UseMatchActivation = (matchId) => {
       return true;
     } catch (err) {
       console.error("Error activating match:", err);
-      alert("⚠️ Failed to activate match. Please try again.");
+      alert("⚠️ Failed to activate match. SESSION EXPIRED PLEASE LOGIN AGAIN.");
       return false;
     } finally {
       setActivating(false);

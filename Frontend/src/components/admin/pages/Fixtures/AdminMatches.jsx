@@ -200,6 +200,58 @@ const AdminMatches = () => {
   const [syncing, setSyncing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 const [activeCount, setActiveCount] = useState(0);
+const [automationEnabled,setAutomationEnabled] = useState(false);
+
+
+const fetchAutomationStatus = async () => {
+
+  try {
+
+    const res = await axios.get(
+      'http://localhost:5000/api/admin/automation/status'
+    );
+
+    setAutomationEnabled(
+      Boolean(res.data.auto_mode)
+    );
+
+  } catch(err){
+
+    console.error(err);
+
+  }
+
+};
+
+const toggleAutomation = async () => {
+
+  try {
+
+    const newValue =
+      automationEnabled ? 0 : 1;
+
+    await axios.put(
+      'http://localhost:5000/api/admin/automation/update-status',
+      {
+        auto_mode: newValue
+      }
+    );
+
+    setAutomationEnabled(
+      Boolean(newValue)
+    );
+
+  } catch(err){
+
+    console.error(err);
+
+    alert(
+      'Failed to update automation'
+    );
+
+  }
+
+};
 
   const addToast = useCallback((msg, type = 'success') => {
     const id = Date.now();
@@ -241,6 +293,7 @@ const [activeCount, setActiveCount] = useState(0);
   }
 }, []);
 
+   useEffect(() => { fetchAutomationStatus(); }, []);
   useEffect(() => { fetchFixtures(); fetchActiveCount(); }, [fetchFixtures, fetchActiveCount]);
 
   const handleSync = async () => {
@@ -310,6 +363,9 @@ const [activeCount, setActiveCount] = useState(0);
     navigate(`/admin/viewContest/${fixture.id}`);
   };
 
+
+
+
   /* ── render states ── */
   if (loading) return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
@@ -340,6 +396,8 @@ const [activeCount, setActiveCount] = useState(0);
         onLogout={handleLogout}
         syncing={syncing}
         refreshing={refreshing}
+         automationEnabled={automationEnabled}
+  toggleAutomation={toggleAutomation}
       />
 
       {/* ticker */}
@@ -424,7 +482,7 @@ const [activeCount, setActiveCount] = useState(0);
 };
 
 /* ─── Topbar extracted for reuse in loading/error states ─── */
-const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing }) => (
+const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing,  automationEnabled,toggleAutomation }) => (
   <nav className="am-topbar">
     <div className="am-brand">
       <div className="am-brand-icon">
@@ -445,6 +503,20 @@ const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing }) => (
       <button className="btn btn-danger" onClick={onLogout}>
         <Icon.Logout /> Logout
       </button>
+<button
+  className={`btn ${
+    automationEnabled
+      ? 'btn-success'
+      : 'btn-danger'
+  }`}
+  onClick={toggleAutomation}
+>
+  {automationEnabled
+    ? '🟢 Automation ON'
+    : '🔴 Automation OFF'}
+</button>
+
+
     </div>
   </nav>
 );

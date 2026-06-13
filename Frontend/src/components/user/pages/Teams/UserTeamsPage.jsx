@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/UserTeamsPage.css';
 
@@ -8,6 +8,8 @@ const UserTeamsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchUserTeams = async () => {
@@ -32,8 +34,8 @@ const UserTeamsPage = () => {
         const fetchedTeams = response.data.teams || [];
         setTeams(fetchedTeams);
         console.log('Fetched teams:', fetchedTeams);
-        console.log('Match IDs:', fetchedTeams.map(team => team.match?.id));
-        console.log('First match id:', fetchedTeams[0]?.match?.id);
+        console.log('Match IDs:', fetchedTeams.map(team => team.match?.id || team.match_id));
+        console.log('First match id:', fetchedTeams[0]?.match?.id || fetchedTeams[0]?.match_id);
       } catch (err) {
         console.error('Error fetching teams:', err);
         setError(err.response?.data?.message || 'Failed to fetch teams');
@@ -62,12 +64,20 @@ const UserTeamsPage = () => {
     navigate('/user/matches')
   }
 
-  const handleCreateTeam = () => {
-    const matchId = teams[0]?.match?.id;
+  const handleCreateTeam = (team) => {
+    const matchId =
+      team?.match?.id ||
+      team?.match_id ||
+      location.state?.matchId ||
+      location.state?.match_id ||
+      teams[0]?.match?.id ||
+      teams[0]?.match_id;
+
     if (matchId) {
       navigate(`/user/create_team/${matchId}`);
     } else {
-      console.log('Match ID not found');
+      alert('Please select a match first to create a team.');
+      navigate('/user/matches');
     }
   };
 
@@ -234,6 +244,15 @@ const UserTeamsPage = () => {
                     }}
                   >
                     Edit Team
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCreateTeam(team);
+                    }}
+                  >
+                    Create for Match
                   </button>
                   <button
                     className="btn btn-danger"

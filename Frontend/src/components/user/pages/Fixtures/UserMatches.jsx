@@ -126,6 +126,11 @@ const FixtureCard = ({ fixture, onViewSquad, onViewContest }) => {
           {isLive && <span className="am-live-dot" />}
           <span className="am-match-type-badge">{fixture.matchType || 'T20'}</span>
           <span className="am-match-id">#{fixture.id}</span>
+             <span className="am-match-type-badge">
+              {fixture.activationStatus
+      ? "ACTIVE"
+      : "PENDING"}
+             </span>
         </div>
         <div className="am-card-date">
           <Icon.Cal />
@@ -239,10 +244,16 @@ const [walletBalance, setWalletBalance] = useState(0);
           matchName: fixture.round,
           dateTime: fixture.starting_at,
           matchType: fixture.type,
+            activationStatus: Number(fixture.is_activated),
           homeTeam: { name: fixture.localteam_name, code: fixture.localteam_code, image: fixture.localteam_image },
           awayTeam: { name: fixture.visitorteam_name, code: fixture.visitorteam_code, image: fixture.visitorteam_image },
         }));
-        setFixtures(filteredFixtures);
+      const sortedFixtures = [...filteredFixtures].sort((a, b) => {
+  return b.activationStatus - a.activationStatus;
+});
+
+setFixtures(sortedFixtures);
+
       } else {
         throw new Error('Failed to fetch fixtures');
       }

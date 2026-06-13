@@ -6,7 +6,7 @@ const {OAuth2Client} = require ('google-auth-library');
 const transporter = require('./mailer');
 const { sendOtpMail } = require('./mailService');
 const { validationResult } = require('express-validator');
-
+const { createWallet } = require('../../../paymentControllers/userWallet');
 const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -71,6 +71,8 @@ exports.googleLogin = async (req, res) => {
         email
       };
 
+      await createWallet(result.insertId);
+    
     } else {
 
       user = users[0];
@@ -86,6 +88,8 @@ exports.googleLogin = async (req, res) => {
           [googleId, user.id]
         );
       }
+
+      await createWallet(user.id);
     }
 
     const token = jwt.sign(
@@ -228,6 +232,8 @@ exports.register = async (req, res, next) => {
 
     console.log("USER INSERT RESULT:", result);
 
+    await createWallet(result.insertId);
+
     console.log("Cleaning OTP records...");
     await db.query(
       `
@@ -345,6 +351,8 @@ exports.login = async (req, res, next) => {
           "Invalid email or password"
       });
     }
+
+    await createWallet(user.id);
 
     console.log("Signing JWT...");
     const token = jwt.sign(

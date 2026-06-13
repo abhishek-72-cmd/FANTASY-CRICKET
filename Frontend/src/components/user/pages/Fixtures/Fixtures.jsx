@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import ('../../styles/UserMatches.css')
 import { useNavigate } from 'react-router-dom';
 
@@ -226,19 +227,27 @@ const [walletBalance, setWalletBalance] = useState(0);
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 4000);
   }, []);
 
+
   const fetchFixtures = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/admin/fixtures/FetchFromDB/getFixtures');
       if (response.data.success) {
+        console.log ('Raw fixtures from API: ', response.data.data);
         const filteredFixtures = response.data.data.map(fixture => ({
           id: fixture.id,
           matchName: fixture.round,
           dateTime: fixture.starting_at,
+          activationStatus: Number(fixture.is_activated),
           matchType: fixture.type,
           homeTeam: { name: fixture.localteam_name, code: fixture.localteam_code, image: fixture.localteam_image },
           awayTeam: { name: fixture.visitorteam_name, code: fixture.visitorteam_code, image: fixture.visitorteam_image },
         }));
-        setFixtures(filteredFixtures);
+   const sortedFixtures = [...filteredFixtures].sort((a, b) => {
+  return b.activationStatus - a.activationStatus;
+});
+
+setFixtures(sortedFixtures);
+
       } else {
         throw new Error('Failed to fetch fixtures');
       }
@@ -249,19 +258,20 @@ const [walletBalance, setWalletBalance] = useState(0);
     }
   }, []);
 
-  useEffect(() => { fetchFixtures(); }, [fetchFixtures]);
-
-  useEffect(() => {
-  fetchBalance();
-}, []);
-
-const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
   try {
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+
+    const decoded = jwtDecode(token);
+    const userId = decoded.userId;
+    if (!userId) return;
+
     const res = await axios.get(
-      `http://localhost:5000/api/user/wallet/getBalance/${userId}`,
+      `http://localhost:5000/api/user/wallet/getWalletBalance/${userId}`,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`
+          Authorization: `Bearer ${token}`
         }
       }
     );
@@ -272,7 +282,13 @@ const fetchBalance = async () => {
   } catch (err) {
     console.error(err);
   }
-};
+}, []);
+
+  useEffect(() => { fetchFixtures(); }, [fetchFixtures]);
+
+  useEffect(() => {
+  fetchBalance();
+}, [fetchBalance]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -371,6 +387,8 @@ const fetchBalance = async () => {
         onLogout={handleLogout}
         syncing={syncing}
         refreshing={refreshing}
+        walletBalance={walletBalance}
+        onFetchBalance={fetchBalance}
       />
 
       {/* ticker */}
@@ -455,7 +473,7 @@ const fetchBalance = async () => {
 };
 
 /* ─── Topbar extracted for reuse in loading/error states ─── */
-const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing }) => (
+const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing, walletBalance = 0, onFetchBalance }) => (
   <nav className="am-topbar">
     <div className="am-brand">
       <div className="am-brand-icon">
@@ -475,11 +493,11 @@ const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing }) => (
    
 <div
   className="wallet-chip"
-  onClick={showBalance}
+  onClick={onFetchBalance}
   title="Wallet Balance"
 >
   <Icon.Coin />
-  <span>{walletBalance}</span>
+  <span>₹{Number(walletBalance || 0).toFixed(2)}</span>
 </div>
 
 

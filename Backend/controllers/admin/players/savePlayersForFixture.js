@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const savePlayersForFixture = async (match_id) => {
   const [fixtureRows] = await db.query(
-    'SELECT localteam_id, visitorteam_id, season_id FROM fixtures WHERE id = ?',
+    'SELECT league_id, localteam_id, visitorteam_id, season_id FROM fixtures WHERE id = ?',
     [match_id]
   );
 
@@ -13,7 +13,7 @@ const savePlayersForFixture = async (match_id) => {
   }
 
   const fixture = fixtureRows[0];
-  const { localteam_id, visitorteam_id, season_id } = fixture;
+  const { league_id, localteam_id, visitorteam_id, season_id } = fixture;
 
   if (!season_id) {
     throw new Error('Season ID missing for this match');
@@ -24,7 +24,7 @@ const savePlayersForFixture = async (match_id) => {
   const fetchAndSaveTeam = async (teamId) => {
     const response = await axios.get(
       `https://cricket.sportmonks.com/api/v2.0/teams/${teamId}/squad/${season_id}`,
-      { params: { api_token } }
+      { params: { api_token }, timeout: 20000 }
     );
 
     const players = response.data.data.squad;
@@ -34,7 +34,14 @@ const savePlayersForFixture = async (match_id) => {
         `INSERT INTO players
          (player_id, team_id, season_id, fullname, position, image_path, battingstyle, bowlingstyle)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE fullname=VALUES(fullname), position=VALUES(position)`,
+         ON DUPLICATE KEY UPDATE
+           team_id = VALUES(team_id),
+           season_id = VALUES(season_id),
+           fullname = VALUES(fullname),
+           position = VALUES(position),
+           image_path = VALUES(image_path),
+           battingstyle = VALUES(battingstyle),
+           bowlingstyle = VALUES(bowlingstyle)`,
         [
           player.id,
           teamId,
@@ -44,6 +51,23 @@ const savePlayersForFixture = async (match_id) => {
           player.image_path,
           player.battingstyle,
           player.bowlingstyle
+        ]
+      );
+
+      await db.query(
+        `INSERT INTO player_points_cache
+         (player_id, team_id, league_id, last_known_credit_points, last_known_points, position)
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           team_id = VALUES(team_id),
+           position = VALUES(position)`,
+        [
+          player.id,
+          teamId,
+          league_id || 0,
+          player.credit_points ?? 0,
+          player.credit_points ?? 0,
+          player.position?.name || null
         ]
       );
     }

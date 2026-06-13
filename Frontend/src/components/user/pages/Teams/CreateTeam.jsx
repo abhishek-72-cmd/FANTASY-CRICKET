@@ -81,7 +81,7 @@ const CreateTeam = ({
   const [viceCaptainId, setViceCaptainId] = useState('');
   const [totalCreditsUsed, setTotalCreditsUsed] = useState(0);
   const [lineupStatus, setLineupStatus] = useState('confirmed');
-
+const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { matchId: matchIdFromParams } = useParams();
@@ -212,6 +212,8 @@ const CreateTeam = ({
   };
 
   const handleSaveTeam = async () => {
+      if (saving) return;
+
     const allPlayers = Object.values(userTeam).flat();
     if (allPlayers.length !== 11) return alert('You must select exactly 11 players');
     if (!captainId || !viceCaptainId) return alert('Please select Captain and Vice-Captain');
@@ -225,6 +227,7 @@ const CreateTeam = ({
     };
 
     try {
+       setSaving(true);
       const token = localStorage.getItem('userToken');
       await axios.post(
         `http://localhost:5000/api/user/team/save/${matchId}`,
@@ -235,10 +238,12 @@ const CreateTeam = ({
     } catch (err) {
       console.error(err);
       alert('Failed to save team.');
+    }  finally{
+          setSaving(false);
     }
   };
 
-  const handleShowTeams = () => navigate('/user/teams', { match_id: matchId });
+  const handleShowTeams = () => navigate('/user/teams', { state: { matchId } });
 
   // ── Derived ────────────────────────────────────────────
   const selectedPlayers = Object.values(userTeam).flat();
@@ -468,7 +473,7 @@ const CreateTeam = ({
 
             {/* Action buttons */}
             <div className="ctb-actions">
-              <button className="ctb-btn ctb-btn--primary" onClick={handleSaveTeam}>
+              <button className="ctb-btn ctb-btn--primary" disabled={saving}  onClick={handleSaveTeam}>
                 {mode === 'edit' ? 'Save Changes' : 'Create Team'}
               </button>
               <button className="ctb-btn ctb-btn--secondary" onClick={handleShowTeams}>

@@ -7,6 +7,22 @@ const createWallet = async (userId, joiningBonus = 100) => {
 
         await connection.beginTransaction();
 
+        const [existingWallet] = await connection.query(
+            `
+            SELECT id
+            FROM user_wallet
+            WHERE user_id = ?
+            LIMIT 1
+            FOR UPDATE
+            `,
+            [userId]
+        );
+
+        if (existingWallet.length > 0) {
+            await connection.commit();
+            return false;
+        }
+
         await connection.query(
             `
             INSERT INTO user_wallet
@@ -49,6 +65,11 @@ const createWallet = async (userId, joiningBonus = 100) => {
     } catch (err) {
 
         await connection.rollback();
+
+        if (err.code === 'ER_DUP_ENTRY') {
+            return false;
+        }
+
         throw err;
 
     } finally {

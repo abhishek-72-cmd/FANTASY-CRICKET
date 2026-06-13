@@ -292,9 +292,7 @@ const saveFixturesService = async (options = {}) => {
     throw err;
   }
 };
-
 // save the fixtures for last 1 month and next 4 months
-
 const saveFixtures = async (req, res) => {
   try {
     const result = await saveFixturesService();

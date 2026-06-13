@@ -34,6 +34,7 @@ const getWalletTransactions = async (req, res) => {
 };
 
 router.post('/create_wallet/:userId', createUserWallet);
+router.get('/getBalance/:userId', getWalletBalance);
 router.get('/getWalletBalance/:userId', getWalletBalance);
 router.get('/getTransactionHistory/:userId', getWalletTransactions);
 
