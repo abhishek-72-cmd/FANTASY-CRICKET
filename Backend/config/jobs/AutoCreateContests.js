@@ -2,7 +2,11 @@ const cron = require('node-cron');
 const db = require('../db/db');
 
 cron.schedule('15 */6 * * *', async () => {
+  // for testing every 5 mins
+   
+  // cron.schedule('*/5 * * * *', async () => {
 
+    // console.log ('🔁 Cron triggered (test mode - every 5 mins)')
   try {
 
     const [[settings]] = await db.query(`

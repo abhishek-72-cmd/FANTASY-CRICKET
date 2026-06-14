@@ -153,12 +153,7 @@ async function updateFixtureStatuses(whereClause, label) {
 
       if (err.response?.status === 429) {
         break;
-      }
-
-    }
-
-  }
-
+      }}}
 }
 
 module.exports = updateFixtureStatuses;
