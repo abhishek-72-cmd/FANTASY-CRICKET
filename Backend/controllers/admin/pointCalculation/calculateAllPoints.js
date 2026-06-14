@@ -67,8 +67,21 @@ const calculateAllPoints = async (req, res) => {
       if (event_type === 'DOTBALL') {
         playerPointsMap[bowler_id].dotBalls += 1;
       }
-      if (event_type === 'CATCH') playerPointsMap[assist_player_id].catches += 1;
-      if (event_type === 'STUMPING') playerPointsMap[assist_player_id].stumpings += 1;
+if (
+  event_type === 'CATCH' &&
+  assist_player_id &&
+  playerPointsMap[assist_player_id]
+) {
+  playerPointsMap[assist_player_id].catches += 1;
+}
+
+if (
+  event_type === 'STUMPING' &&
+  assist_player_id &&
+  playerPointsMap[assist_player_id]
+) {
+  playerPointsMap[assist_player_id].stumpings += 1;
+}
       if (event_type === 'RUNOUT') {
         if (assist_player_id) playerPointsMap[assist_player_id].runoutsIndirect += 1;
         else playerPointsMap[bowler_id].runoutsDirect += 1;
@@ -96,7 +109,7 @@ const calculateAllPoints = async (req, res) => {
       if ((stats.balls || 0) >= 5) {
         const sr = (stats.runs / stats.balls) * 100;
         const srRule = rulesMap['Batting'].find(r => r.unit === 'SR' && sr >= (r.min_value || 0) && (!r.max_value || sr <= r.max_value));
-        if (srRule) points += srRule.points;
+        if (srRule) points += Number(srRule.points);
       }
 
       points += (stats.wickets || 0) * getRule('Bowling', 'Wicket');

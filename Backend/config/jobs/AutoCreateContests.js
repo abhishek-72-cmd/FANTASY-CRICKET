@@ -76,7 +76,9 @@ cron.schedule('15 */6 * * *', async () => {
         10,
         2,
         100,
-        'top_3'
+        'top_3',
+          null,
+      null
       ]);
 
       await db.query(`
@@ -88,10 +90,12 @@ cron.schedule('15 */6 * * *', async () => {
           entry_fee,
           min_players,
           max_players,
-          winner_type
+          winner_type,
+          registration_opens,
+          visible_until
         )
         VALUES(
-          ?,?,?,?,?,?,?,?
+          ?,?,?,?,?,?,?,?,?,?
         )
       `,
       [
@@ -102,7 +106,9 @@ cron.schedule('15 */6 * * *', async () => {
         30,
         2,
         100,
-        'top_3'
+        'top_3',
+        null,
+        null
       ]);
 
       console.log(
