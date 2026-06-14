@@ -1,9 +1,14 @@
 require('dotenv').config();
 const db = require('../../../config/db/db');
 
-const calculateAllPoints = async (req, res) => {
-  const { matchId } = req.params;
-  if (!matchId) return res.status(400).json({ message: 'matchId is required' });
+const calculateAllPointsService = async (matchId) => {
+
+
+  if (!matchId) {
+  throw new Error(
+    'matchId is required'
+  );
+}
 
   try {
     console.log(` Starting point calculation for match ${matchId}`);
@@ -191,4 +196,37 @@ if (
   }
 };
 
-module.exports = calculateAllPoints;
+
+const calculateAllPoints =async(req,res)=>{
+  try{
+    const { matchId } =
+      req.params;
+
+    const result =
+      await calculateAllPointsService(
+        matchId
+      );
+
+    return res.json({
+      message:
+        `Points calculated for match ${matchId}`,
+      result
+    });
+
+  }
+  catch(err){
+
+    return res.status(500).json({
+      message:
+        'Failed to calculate points',
+      error: err.message
+    });
+
+  }
+
+};
+
+module.exports = {
+  calculateAllPoints,
+  calculateAllPointsService
+};
