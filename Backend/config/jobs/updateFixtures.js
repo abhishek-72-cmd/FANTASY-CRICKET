@@ -3,8 +3,13 @@ const { saveFixturesService } = require('../../controllers/admin/matches/fixture
 
 // Updates only the next 7 days of upcoming fixtures to keep near-term dates/times fresh.
 
+// every 6 hours 
 
-cron.schedule('0 2 * * *', async () => {
+
+// 0 */6 * * *
+//*/10 * * * *
+
+cron.schedule('0 */6 * * *', async () => {
 
     console.log ('||| updating fixtures ||| ')
 

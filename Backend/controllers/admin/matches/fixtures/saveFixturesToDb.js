@@ -129,7 +129,7 @@ const db = require('../../../../config/db/db');
 
 
 
-
+const runfixtureAutomation = require('../../Automation/runFixtureAutomation');
 
 
 const yyyyMmDd = d => d.toISOString().slice(0, 10);
@@ -207,6 +207,7 @@ const buildFixtureUrls = ({ includeFinished, includeUpcoming, pastMonths, upcomi
   return urls;
 };
 
+
 const saveFixturesService = async (options = {}) => {
   const {
     includeFinished = true,
@@ -275,6 +276,13 @@ const saveFixturesService = async (options = {}) => {
 
         console.log(`[SUCCESS] Saved fixture ${fixture.id} (${fixture.status})`);
         savedCount++;
+// most important part - run automation for the fixture if it is new or updated to NS status
+// we can check if the fixture is new or updated to NS by checking the status and is_activated fields
+// if status is NS and is_activated is 0, then it means the fixture is new or updated to NS, so we run the automation
+// if status is not NS, then we don't care about it for automation, even if it is new, because automation only runs for NS fixtures
+// if status is NS but is_activated is 1, then it means the fixture was already activated before, so we don't run the automation again
+        await runfixtureAutomation(fixture);
+
       }
     }
 
@@ -292,6 +300,10 @@ const saveFixturesService = async (options = {}) => {
     throw err;
   }
 };
+
+
+
+
 // save the fixtures for last 1 month and next 4 months
 const saveFixtures = async (req, res) => {
   try {

@@ -15,7 +15,7 @@ app.use(express.json());
 
 
 require ('./config/jobs/updateFixtureStatuses.js')
-// require ('./config/jobs/fetchMatchEventsCron.js')
+ // require ('./config/jobs/fetchMatchEventsCron.js')
 // require('./config/jobs/calculatePointsCron.js')
 require('./config/jobs/updateFixtures.js')
 require('./config/jobs/farMatchCron.js')
@@ -23,7 +23,7 @@ require('./config/jobs/nearMatchCron.js')
 require('./config/jobs/fetchFinalLineups.js')
 require('./config/jobs/AutoCreateContests.js')
 require('./config/jobs/postMatchProcessor.js')
-
+require('./config/jobs/testAutomation.js')
 
 
 const errorHandler = require ('./middlewares/errorHandler.js')

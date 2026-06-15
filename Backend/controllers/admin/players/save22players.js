@@ -155,19 +155,23 @@ if (!league_id) throw new Error('league_id missing in fixture');
       ]
     );
 
-    const [[meta]] = await db.query(
-      `SELECT
-         p.image_path,
-         p.battingstyle,
-         p.bowlingstyle,
-         ppc.last_known_credit_points
-       FROM players p
-       LEFT JOIN player_points_cache ppc
-         ON ppc.player_id = p.player_id
-        AND ppc.league_id = ?
-       WHERE p.player_id = ?`,
-      [league_id, playerId]
-    );
+  const [[meta]] = await db.query(
+  `SELECT
+      p.image_path,
+      p.battingstyle,
+      p.bowlingstyle,
+      p.credit_points,
+      ppc.last_known_credit_points
+    FROM players p
+    LEFT JOIN player_points_cache ppc
+      ON ppc.player_id = p.player_id
+      AND ppc.league_id = ?
+    WHERE p.player_id = ?`,
+  [
+    league_id,
+    playerId
+  ]
+);
 
     await db.query(
       `INSERT INTO 22_match_players
@@ -188,7 +192,9 @@ if (!league_id) throw new Error('league_id missing in fixture');
       [
         match_id,league_id, playerId, team_id, fullname,
         is_substitute, position,
-        meta?.last_known_credit_points ?? 0,
+      meta?.credit_points ??
+meta?.last_known_credit_points ??
+7, // default to 7 if both are null/undefined
         meta?.image_path || null,
         meta?.battingstyle || null,
         meta?.bowlingstyle || null

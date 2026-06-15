@@ -29,14 +29,20 @@ async (matchId) => {
 
   const [[credits]] =
     await db.query(`
-      SELECT COUNT(*) total
-      FROM 22_match_players
-      WHERE match_id=?
-      AND credit_points IS NOT NULL
-    `,
-    [matchId]);
+SELECT COUNT(*) total
+FROM players p
+INNER JOIN fixtures f
+ON f.id = ?
+WHERE p.season_id = f.season_id
+AND p.team_id IN (
+  f.localteam_id,
+  f.visitorteam_id
+)
+AND p.credit_points > 0
+`,
+[matchId]);
 
-  if(credits.total < 22){
+  if(credits.total === 0){
     throw new Error(
       'Credits missing'
     );
