@@ -20,6 +20,9 @@ import UserRoutes from './components/user/routes/UserRoutes';
 // Define your GOOGLE_CLIENT_ID here (e.g., from .env)
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
+console.log("CLIENT ID:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+console.log("API URL:", import.meta.env.VITE_API_URL);
+
 
 function App() {
   return (
