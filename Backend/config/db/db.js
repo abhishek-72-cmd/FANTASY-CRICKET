@@ -1,5 +1,17 @@
 const mysql = require ('mysql2');
 require ('dotenv').config();
+const fs = require ('fs');
+ const path = require ('path');
+
+const caPath = path.join(__dirname, 'isrgrootx1.pem');
+
+console.log(caPath);
+
+console.log(
+  fs.existsSync(
+    path.join(__dirname, 'isrgrootx1.pem')
+  )
+);
 
 
 const pool = mysql.createPool({
@@ -10,6 +22,10 @@ const pool = mysql.createPool({
   port: process.env.DB_PORT  || 3306,
   connectionLimit: 10,
    connectTimeout: 10000, //10 sec
+   ssl: {
+  ca: fs.readFileSync(caPath)
+}
+   
 })
 
 

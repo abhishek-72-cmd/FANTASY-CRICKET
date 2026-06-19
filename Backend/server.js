@@ -62,6 +62,18 @@ async function connectDB(retries = 3) {
 }
 
 
+
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error("DB Error:", err);
+    return;
+  }
+
+  console.log("Database Connected");
+  connection.release();
+});
+
+
 (async () => {
   try {
     await connectDB(3);
