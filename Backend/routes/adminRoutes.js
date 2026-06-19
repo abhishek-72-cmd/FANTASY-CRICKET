@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.use('/auth', require('../subRoutes/admin/adminAuthRoutes'));
-router.use('/sync', require('../subRoutes/admin/allSyncRoutes'));
+router.use('/sync', require('../subRoutes/admin/AllsyncRoutes'));
 router.use('/points', require('../subRoutes/admin/calculatePointRoute'));
 router.use('/contests', require('../subRoutes/admin/contestRoutes'));
 router.use('/fixtures', require('../subRoutes/admin/fixturesRoutes'));

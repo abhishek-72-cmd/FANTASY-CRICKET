@@ -79,7 +79,7 @@ pool.getConnection((err, connection) => {
     await connectDB(3);
 
     app.listen(PORT, () => {
-      console.log(`app is running on http://localhost:${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
 
   } catch (err) {
