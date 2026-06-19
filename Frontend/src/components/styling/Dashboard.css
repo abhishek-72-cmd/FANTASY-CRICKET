@@ -1,0 +1,393 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Root Tokens (shared with admin theme) ─────────────────── */
+:root {
+  --pitch: #0a1a0f;
+  --pitch-mid: #0d2214;
+  --pitch-surface: #122b1a;
+  --line-primary: #00e676;
+  --line-dim: rgba(0, 230, 118, 0.18);
+  --amber-flare: #ffab00;
+  --amber-dim: rgba(255, 171, 0, 0.15);
+  --red-alert: #ff3d3d;
+  --score-white: #f0f4f1;
+  --score-muted: #7a9e85;
+  --score-ghost: #3d5c47;
+  --glass: rgba(10, 26, 15, 0.82);
+  --glass-edge: rgba(0, 230, 118, 0.12);
+  --font-display: 'Bebas Neue', Impact, sans-serif;
+  --font-body: 'Rajdhani', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Page Shell ─────────────────────────────────────────────── */
+.dashboard-container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 32px 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(0, 230, 118, 0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 35% at 10% 100%, rgba(255, 171, 0, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 35% at 90% 100%, rgba(255, 171, 0, 0.05) 0%, transparent 60%),
+    repeating-linear-gradient(
+      0deg, transparent, transparent 60px,
+      rgba(0, 230, 118, 0.025) 60px, rgba(0, 230, 118, 0.025) 61px
+    ),
+    repeating-linear-gradient(
+      90deg, transparent, transparent 60px,
+      rgba(0, 230, 118, 0.018) 60px, rgba(0, 230, 118, 0.018) 61px
+    ),
+    var(--pitch);
+  font-family: var(--font-body);
+  color: var(--score-white);
+}
+
+/* Pitch crease arc — decorative, behind content */
+.dashboard-container::before {
+  content: '';
+  position: absolute;
+  bottom: -45%;
+  left: 50%;
+  width: 900px;
+  height: 900px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(0, 230, 118, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dashboard-container::after {
+  content: '';
+  position: absolute;
+  bottom: -45%;
+  left: 50%;
+  width: 650px;
+  height: 650px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(0, 230, 118, 0.06);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Floating stitched-ball seam accents (pure CSS, subtle) */
+.seam-glow {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 171, 0, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.seam-glow.top-left { top: -80px; left: -80px; }
+.seam-glow.bottom-right { bottom: -80px; right: -80px; }
+
+/* ── Brand / Title ──────────────────────────────────────────── */
+.brand-block {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  animation: brandEntry 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes brandEntry {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.brand-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--score-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.brand-eyebrow .live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-primary);
+  animation: blinkDot 1.2s ease-in-out infinite;
+}
+
+@keyframes blinkDot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.dashboard-title {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 9vw, 72px);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--score-white);
+  text-shadow: 0 0 24px rgba(0, 230, 118, 0.25);
+}
+
+.dashboard-title .accent {
+  color: var(--line-primary);
+}
+
+.dashboard-subtitle {
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--score-muted);
+}
+
+/* ── User-Login Notice Banner ───────────────────────────────── */
+.role-notice {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 480px;
+  width: 100%;
+  background: var(--amber-dim);
+  border: 1px solid rgba(255, 171, 0, 0.35);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  animation: noticeEntry 0.5s ease 0.15s both;
+}
+
+@keyframes noticeEntry {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.role-notice .notice-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--amber-flare);
+  color: var(--pitch);
+  font-family: var(--font-display);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: noticePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes noticePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 171, 0, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(255, 171, 0, 0); }
+}
+
+.role-notice p {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--score-white);
+}
+
+.role-notice p strong {
+  color: var(--amber-flare);
+  font-weight: 600;
+}
+
+/* ── Button Row ─────────────────────────────────────────────── */
+.role-button-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Shared Role Card Button ────────────────────────────────── */
+.role-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 220px;
+  padding: 22px 22px 20px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  font-family: var(--font-body);
+  animation: cardEntry 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.role-card.user-card { animation-delay: 0.25s; }
+.role-card.admin-card { animation-delay: 0.35s; }
+
+@keyframes cardEntry {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.role-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.role-card.user-card::before { background: var(--line-primary); }
+.role-card.admin-card::before { background: var(--amber-flare); }
+
+.role-card:hover::before {
+  transform: scaleX(1);
+}
+
+.role-card:hover {
+  transform: translateY(-4px);
+}
+
+.role-card.user-card:hover {
+  border-color: rgba(0, 230, 118, 0.4);
+  box-shadow: 0 10px 28px rgba(0, 230, 118, 0.18);
+}
+
+.role-card.admin-card:hover {
+  border-color: rgba(255, 171, 0, 0.4);
+  box-shadow: 0 10px 28px rgba(255, 171, 0, 0.16);
+}
+
+.role-card:active {
+  transform: translateY(-1px);
+}
+
+.role-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.role-card.user-card .role-card-icon {
+  background: rgba(0, 230, 118, 0.12);
+  color: var(--line-primary);
+}
+
+.role-card.admin-card .role-card-icon {
+  background: rgba(255, 171, 0, 0.12);
+  color: var(--amber-flare);
+}
+
+.role-card-label {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--score-white);
+}
+
+.role-card-desc {
+  font-size: 12px;
+  color: var(--score-muted);
+  letter-spacing: 0.3px;
+}
+
+.role-card-cta {
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.role-card.user-card .role-card-cta { color: var(--line-primary); }
+.role-card.admin-card .role-card-cta { color: var(--amber-flare); }
+
+.role-card-cta .arrow {
+  transition: transform 0.2s ease;
+}
+
+.role-card:hover .role-card-cta .arrow {
+  transform: translateX(4px);
+}
+
+/* ── Footer Ticker Strip ────────────────────────────────────── */
+.dashboard-ticker {
+  position: relative;
+  z-index: 2;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--score-ghost);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-ticker .sep {
+  color: var(--score-ghost);
+  opacity: 0.5;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 520px) {
+  .role-button-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .role-card {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .dashboard-title {
+    letter-spacing: 3px;
+  }
+
+  .role-notice {
+    padding: 12px 14px;
+  }
+}
