@@ -6,6 +6,7 @@ const UseCheckActivation = (fixtureId)=>{
 const [isActivated, setIsActivated] = useState(null)
  const [loading, setLoading] = useState( null)
 const [error,setError] = useState(null);
+const API_URL = import.meta.env.VITE_API_URL;
 
 useEffect (()=>{
 if(!fixtureId) return;
@@ -13,7 +14,7 @@ if(!fixtureId) return;
   const fetchActivationStatus = async ()=>{
     
     try{
-  const response =  await axios.get (`http://localhost:5000/api/admin/activation/admin/activation-status/${fixtureId}`)
+  const response =  await axios.get (`${API_URL}/api/admin/activation/admin/activation-status/${fixtureId}`)
 
 setIsActivated(response.data.is_activated)
 

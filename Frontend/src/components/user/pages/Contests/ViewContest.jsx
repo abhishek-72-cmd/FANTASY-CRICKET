@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import '../../styles/ViewContests.css'
 import UseCheckActivation from "../../../common/middleware/UseCheckActivation";
+const API_URL = import.meta.env.VITE_API_URL;
 
 /* ── helpers ── */
 const calculateTotalEntryFee = (contest) => {
@@ -118,7 +119,7 @@ const ViewContest = () => {
       setFetching(true);
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/admin/contests/view/${fixtureId}`
+          `${API_URL}/api/admin/contests/view/${fixtureId}`
         );
         setContests(response.data.contests || []);
       } catch (err) {

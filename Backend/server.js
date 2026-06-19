@@ -8,7 +8,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 //middlewares
-app.use (cors())
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://your-vercel-domain.vercel.app'
+  ],
+  credentials: true
+}));
+
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());

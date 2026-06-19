@@ -19,7 +19,7 @@
 //   const handleRegister = async (e) => {
 //     e.preventDefault();
 //     try {
-//       const res = await axios.post('http://localhost:5000/api/user/auth/register', formData);
+//       const res = await axios.post(`${API_URL}/api/user/auth/register`, formData);
 //       setMessage(res.data.message);
 //       navigate('/admin/login')
 //     } catch (err) {
@@ -90,7 +90,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/UserAuth.css';
 import { useNavigate } from 'react-router-dom';
-
+const API_URL = import.meta.env.VITE_API_URL;
 
 
 const UserRegister = () => {
@@ -126,7 +126,7 @@ try {
   setLoading(true);
 
   const res = await axios.post(
-    'http://localhost:5000/api/user/auth/send-registration-otp',
+    `${API_URL}/api/user/auth/send-registration-otp`,
     {
       email: formData.email
     }
@@ -159,7 +159,7 @@ try {
   setLoading(true);
 
   await axios.post(
-    'http://localhost:5000/api/user/auth/verify-registration-otp',
+    `${API_URL}/api/user/auth/verify-registration-otp`,
     {
       email: formData.email,
       otp
@@ -167,7 +167,7 @@ try {
   );
 
   const registerRes = await axios.post(
-    'http://localhost:5000/api/user/auth/register',
+    `${API_URL}/api/user/auth/register`,
     formData
   );
 

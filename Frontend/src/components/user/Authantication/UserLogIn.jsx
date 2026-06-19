@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/UserAuth.css';
 import { GoogleLogin } from '@react-oauth/google';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const UserLogin = () => {
 
@@ -33,7 +34,7 @@ try {
   localStorage.removeItem('userToken');
 
   const res = await axios.post(
-    'http://localhost:5000/api/user/auth/login',
+    `${API_URL}/api/user/auth/login`,
     formData
   );
 
@@ -76,7 +77,7 @@ try {
   setLoading(true);
 
   const res = await axios.post(
-    'http://localhost:5000/api/user/auth/google-login',
+    `${API_URL}/api/user/auth/google-login`,
     {
       credential:
         credentialResponse.credential

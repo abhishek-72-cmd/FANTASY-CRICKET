@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DeleteContest = () => {
   const { contestId } = useParams();
@@ -25,7 +26,7 @@ const DeleteContest = () => {
         }
 
         const response = await axios.delete(
-          `http://localhost:5000/api/admin/contests/delete/${contestId}`,
+          `${API_URL}/api/admin/contests/delete/${contestId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`

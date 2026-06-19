@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom'; 
 import UseCheckActivation from '../../../common/middleware/UseCheckActivation';
-
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ViewSquad = () => {
   const { matchId } = useParams();
@@ -15,7 +15,7 @@ const ViewSquad = () => {
 
     const fetchPlayers = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/admin/squads/fetch-players/${matchId}`);
+        const res = await axios.get(`${API_URL}/api/admin/squads/fetch-players/${matchId}`);
         console.log("Fetched response:", res.data);
         if (Array.isArray(res.data?.data)) {
           setTeams(res.data.data);
@@ -77,7 +77,7 @@ const ViewSquad = () => {
       console.log("Saving points data:", pointsData);
 
       await axios.post(
-        `http://localhost:5000/api/admin/squads/update-points/${matchId}`,
+        `${API_URL}/api/admin/squads/update-points/${matchId}`,
         { pointsData }
       );
       alert('Credit points saved!');

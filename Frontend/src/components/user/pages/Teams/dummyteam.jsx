@@ -4,6 +4,7 @@ import Sortable from 'sortablejs';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/CreateTeam.css';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const CreateTeam = ({
   mode = 'create',                // 'create' or 'edit'
@@ -51,7 +52,7 @@ const CreateTeam = ({
       console.error("No matchId found!");
       return;
     }
-    fetch(`http://localhost:5000/api/admin/squads/get-or-fetch-players/${matchId}`)
+    fetch(`${API_URL}/api/admin/squads/get-or-fetch-players/${matchId}`)
       .then(res => res.json())
       .then(data => {
         setTeamAPlayers(data.localPlayers || []);
@@ -167,7 +168,7 @@ useEffect(() => {
       } else {
         // Default create team save
         const res = await axios.post(
-          'http://localhost:5000/api/user/team/save/',
+          `${API_URL}/api/user/team/save/`,
           {
             match_id: matchId,
             players: selectedPlayers,

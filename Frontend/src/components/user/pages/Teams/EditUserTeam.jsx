@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CreateTeam from "./CreateTeam";
 import '../../styles/EditUserTeam.css'
+const API_URL = import.meta.env.VITE_API_URL;
+
 // const EditUserTeam = () => {
 //   const { teamId } = useParams();
 //   console.log (teamId)
@@ -27,7 +29,7 @@ import '../../styles/EditUserTeam.css'
 
 //       try {
 //         const res = await axios.get(
-//           `http://localhost:5000/api/user_teams/my_teams`, // you may want a specific endpoint to fetch a single team
+//           `${API_URL}/api/user_teams/my_teams`, // you may want a specific endpoint to fetch a single team
 //           {
 //             headers: { Authorization: `Bearer ${token}` },
 //           }
@@ -71,7 +73,7 @@ import '../../styles/EditUserTeam.css'
 
 //     try {
 //       await axios.put(
-//         `http://localhost:5000/api/db/fetch_api_data/edit_team/${teamId}`,
+//         `${API_URL}/api/db/fetch_api_data/edit_team/${teamId}`,
 //         { players: updatedPlayers },
 //         {
 //           headers: {
@@ -149,7 +151,7 @@ const EditUserTeam = () => {
   useEffect(() => {
     const fetchTeam = async () => {
       const token = localStorage.getItem("userToken");
-      const res = await axios.get(`http://localhost:5000/api/user/team/my_teams`, {
+      const res = await axios.get(`${API_URL}/api/user/team/my_teams`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const found = res.data.teams.find(t => t.team_id === Number(teamId));
@@ -160,7 +162,7 @@ const EditUserTeam = () => {
 
   const handleUpdate = async (players) => {
     const token = localStorage.getItem("userToken");
-    await axios.put(`http://localhost:5000/api/user/team/edit_team/${teamId}`, { players }, {
+    await axios.put(`${API_URL}/api/user/team/edit_team/${teamId}`, { players }, {
       headers: { Authorization: `Bearer ${token}` }
     });
     alert("Team updated successfully");

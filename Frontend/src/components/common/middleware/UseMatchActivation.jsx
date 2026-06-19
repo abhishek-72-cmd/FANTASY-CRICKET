@@ -21,7 +21,7 @@ import axios from 'axios';
 //       try {
 //       setActivating(true);
 //       await axios.post(
-//         `http://localhost:5000/api/admin/activation/admin/activate-match/${matchId}`,
+//         `${API_URL}/api/admin/activation/admin/activate-match/${matchId}`,
 //         {},
 //         {
 //           headers: {
@@ -49,6 +49,7 @@ const UseMatchActivation = (matchId) => {
   const [checkContest, setCheckContest] = useState(null);
   const [checkPoints, setCheckPoints] = useState(null);
   const [activating, setActivating] = useState(false);
+const API_URL = import.meta.env.VITE_API_URL;
 
   const activateMatch = async () => {
     const confirm = window.confirm(
@@ -68,7 +69,7 @@ const UseMatchActivation = (matchId) => {
       // ✅ 1. Check if at least one contest is created
 
       const contestRes = await axios.get(
-        `http://localhost:5000/api/admin/contests/view/${matchId}`
+        `${API_URL}/api/admin/contests/view/${matchId}`
       );
 
       const contests = contestRes?.data?.contests || [];
@@ -83,7 +84,7 @@ const UseMatchActivation = (matchId) => {
 
       // ✅ 2. Check if player credit points have been updated
       const pointsRes = await axios.get(
-        `http://localhost:5000/api/admin/points/get-points/${matchId}`
+        `${API_URL}/api/admin/points/get-points/${matchId}`
       );
       const pointsPresent = pointsRes?.data?.pointsAvailable;
 
@@ -102,7 +103,7 @@ const UseMatchActivation = (matchId) => {
 
       // ✅ 3. Proceed with activation
       await axios.post(
-        `http://localhost:5000/api/admin/activation/admin/activate-match/${matchId}`,
+        `${API_URL}/api/admin/activation/admin/activate-match/${matchId}`,
         {},
         {
           headers: {

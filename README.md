@@ -115,7 +115,7 @@ cd frontend
 
 npm install
 Create:
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=${API_URL}
 Start frontend:
 npm start
 Frontend runs on:
@@ -139,7 +139,7 @@ GOOGLE_CLIENT_ID=your_google_client_id
 Start backend:
 npm start
 Backend runs on:
-http://localhost:5000
+${API_URL}
 ________________________________________
 Starting the Application
 Frontend

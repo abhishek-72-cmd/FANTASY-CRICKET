@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DeleteUserTeam = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const DeleteUserTeam = () => {
       }
 
       try {
-        const res = await axios.delete(`http://localhost:5000/api/user/team/delete/${teamId}`, {
+        const res = await axios.delete(`${API_URL}/api/user/team/delete/${teamId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

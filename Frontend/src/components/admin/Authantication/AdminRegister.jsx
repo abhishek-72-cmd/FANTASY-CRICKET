@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../styling/AdminAuth.css'; // Create this CSS file
 import { useNavigate } from 'react-router-dom';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminRegister = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +20,7 @@ const AdminRegister = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/admin/auth/register', formData);
+      const res = await axios.post(`${API_URL}/api/admin/auth/register`, formData);
       setMessage(res.data.message);
       navigate('/admin/login')
     } catch (err) {

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../styling/AdminAuth.css'; // Same CSS file as above
 import { Link } from 'react-router-dom';
+import api from "../../../../src/services/api";
+
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({ email: 'dummyuser@gmail.com', password: 'dummy@123' });
@@ -15,7 +17,7 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
         localStorage.removeItem('adminToken');
-      const res = await axios.post('http://localhost:5000/api/admin/auth/login', formData);
+      const res = await api.post('/api/admin/auth/login', formData);
       const token = res.data.token;
       localStorage.setItem('adminToken', token);
       setMessage('Login successful. Redirecting...');

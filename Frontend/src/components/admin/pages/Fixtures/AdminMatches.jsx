@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import '../../styling/AdminMatches.css'
 import { useNavigate } from 'react-router-dom';
+const API_URL = import.meta.env.VITE_API_URL;
 
 /* ─── tiny icon helpers (inline SVG, no deps) ─── */
 const Icon = {
@@ -208,7 +209,7 @@ const fetchAutomationStatus = async () => {
   try {
 
     const res = await axios.get(
-      'http://localhost:5000/api/admin/automation/status'
+      `${API_URL}/api/admin/automation/status`
     );
 
     setAutomationEnabled(
@@ -231,7 +232,7 @@ const toggleAutomation = async () => {
       automationEnabled ? 0 : 1;
 
     await axios.put(
-      'http://localhost:5000/api/admin/automation/update-status',
+      `${API_URL}/api/admin/automation/update-status`,
       {
         auto_mode: newValue
       }
@@ -261,7 +262,7 @@ const toggleAutomation = async () => {
 
   const fetchFixtures = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/fixtures/FetchFromDB/getFixtures');
+      const response = await axios.get(`${API_URL}/api/admin/fixtures/FetchFromDB/getFixtures`);
       if (response.data.success) {
         const filteredFixtures = response.data.data.map(fixture => ({
           id: fixture.id,
@@ -284,7 +285,7 @@ const toggleAutomation = async () => {
 
   const fetchActiveCount = useCallback(async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/admin/activation/active-count');
+    const response = await axios.get(`${API_URL}/api/admin/activation/active-count`);
     if (response.data.success) {
       setActiveCount(response.data.activeCount);
     }
@@ -300,7 +301,7 @@ const toggleAutomation = async () => {
     setSyncing(true);
     try {
       const { data } = await axios.post(
-        'http://localhost:5000/api/admin/fixtures/admin/savefixtures',
+        `${API_URL}/api/admin/fixtures/admin/savefixtures`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } }
       );
@@ -316,7 +317,7 @@ const toggleAutomation = async () => {
     setRefreshing(true);
     try {
       const response = await axios.get(
-        'http://localhost:5000/api/admin/fixtures/FetchFromDB/getFixtures',
+        `${API_URL}/api/admin/fixtures/FetchFromDB/getFixtures`,
         { headers: { Expires: '0' } }
       );
       if (response.data.success) {

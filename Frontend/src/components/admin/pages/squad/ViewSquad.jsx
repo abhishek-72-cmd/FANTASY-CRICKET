@@ -19,6 +19,7 @@ import { useParams, useNavigate } from 'react-router-dom';
  import '../../styling/ViewSquad.css';
 import useCheckActivation from '../../../common/middleware/UseCheckActivation';
 import useMatchActivation from '../../../common/middleware/UseMatchActivation';
+const API_URL = import.meta.env.VITE_API_URL;
 
 /* ── Toast ── */
 const ToastContainer = ({ toasts }) => (
@@ -127,7 +128,7 @@ const ViewSquad = () => {
     if (!matchId) return;
     const fetchPlayers = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/admin/squads/fetch-players/${matchId}`);
+        const res = await axios.get(`${API_URL}/api/admin/squads/fetch-players/${matchId}`);
         if (Array.isArray(res.data?.data)) {
           setTeams(res.data.data);
         } else {
@@ -176,7 +177,7 @@ const ViewSquad = () => {
       }
 
       await axios.post(
-        `http://localhost:5000/api/admin/squads/update-points/${matchId}`,
+        `${API_URL}/api/admin/squads/update-points/${matchId}`,
         { pointsData }
       );
       addToast('Credit points saved successfully!');

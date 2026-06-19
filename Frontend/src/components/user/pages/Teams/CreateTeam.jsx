@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/CreateTeam.css';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // ── Constants ──────────────────────────────────────────────
 const ROLES = ['Wicket Keeper', 'Batsman', 'All Rounder', 'Bowler'];
@@ -119,7 +120,7 @@ const [saving, setSaving] = useState(false);
 
     const fetchSquadPlayers = async () => {
       const res = await axios.get(
-        `http://localhost:5000/api/admin/squads/get-or-fetch-players/${matchId}`
+        `${API_URL}/api/admin/squads/get-or-fetch-players/${matchId}`
       );
       const teamAProcessed = normalizePlayers(res.data?.localPlayers || []);
       const teamBProcessed = normalizePlayers(res.data?.visitorPlayers || []);
@@ -130,7 +131,7 @@ const [saving, setSaving] = useState(false);
     const fetchPlayers = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/admin/squads/fetch-players/${matchId}`
+          `${API_URL}/api/admin/squads/fetch-players/${matchId}`
         );
         const data = res.data?.data;
         const status = res.data?.lineup_status || 'confirmed';
@@ -230,7 +231,7 @@ const [saving, setSaving] = useState(false);
        setSaving(true);
       const token = localStorage.getItem('userToken');
       await axios.post(
-        `http://localhost:5000/api/user/team/save/${matchId}`,
+        `${API_URL}/api/user/team/save/${matchId}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

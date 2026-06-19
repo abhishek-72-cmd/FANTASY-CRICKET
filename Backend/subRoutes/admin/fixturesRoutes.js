@@ -13,7 +13,7 @@ const savePlayersForFinishedFixtures = require('../../controllers/admin/matches/
 
 
 // prev 
-//http://localhost:5000/api/admin/fixtures(use any of the route)
+//${API_URL}/api/admin/fixtures(use any of the route)
 
 
 //route

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "../../styling/ViewContest.css";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const calculateTotalEntryFee = (contest) => {
   const buyIn = parseFloat(contest.buy_in) || 0;
@@ -107,7 +108,7 @@ const ViewContest = () => {
     const fetchContests = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/admin/contests/view/${fixtureId}`
+          `${API_URL}/api/admin/contests/view/${fixtureId}`
         );
         setContests(response.data.contests || []);
         setError(null);

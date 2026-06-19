@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styling/EditContest.css';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const EditContest = () => {
   const { contestId } = useParams();
@@ -15,7 +16,7 @@ const EditContest = () => {
       try {
         const token = localStorage.getItem('adminToken');
         const res = await axios.get(
-          `http://localhost:5000/api/admin/contests/viewById/${contestId}`,
+          `${API_URL}/api/admin/contests/viewById/${contestId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -58,7 +59,7 @@ const EditContest = () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `http://localhost:5000/api/admin/contests/update/${contestId}`,
+        `${API_URL}/api/admin/contests/update/${contestId}`,
         form,
         {
           headers: {

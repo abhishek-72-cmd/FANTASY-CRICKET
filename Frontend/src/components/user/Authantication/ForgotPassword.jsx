@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/UserAuth.css';
 import { useNavigate } from 'react-router-dom';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ForgotPassword = () => {
 
@@ -26,7 +27,7 @@ const ForgotPassword = () => {
       setMessage('');
 
       const res = await axios.post(
-        'http://localhost:5000/api/user/auth/send-reset-otp',
+        `${API_URL}/api/user/auth/send-reset-otp`,
         {
           email
         }
@@ -55,7 +56,7 @@ const ForgotPassword = () => {
       setMessage('');
 
       const res = await axios.post(
-        'http://localhost:5000/api/user/auth/verify-reset-otp',
+        `${API_URL}/api/user/auth/verify-reset-otp`,
         {
           email,
           otp
@@ -92,7 +93,7 @@ const ForgotPassword = () => {
       setMessage('');
 
       const res = await axios.post(
-        'http://localhost:5000/api/user/auth/reset-password',
+        `${API_URL}/api/user/auth/reset-password`,
         {
           email,
           password

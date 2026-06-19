@@ -5,6 +5,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import ('../../styles/UserMatches.css')
 import { useNavigate } from 'react-router-dom';
+const API_URL = import.meta.env.VITE_API_URL;
 
 /* ─── tiny icon helpers (inline SVG, no deps) ─── */
 const Icon = {
@@ -230,7 +231,7 @@ const [walletBalance, setWalletBalance] = useState(0);
 
   const fetchFixtures = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/admin/fixtures/FetchFromDB/getFixtures');
+      const response = await axios.get(`${API_URL}/api/admin/fixtures/FetchFromDB/getFixtures`);
       if (response.data.success) {
         console.log ('Raw fixtures from API: ', response.data.data);
         const filteredFixtures = response.data.data.map(fixture => ({
@@ -268,7 +269,7 @@ setFixtures(sortedFixtures);
     if (!userId) return;
 
     const res = await axios.get(
-      `http://localhost:5000/api/user/wallet/getWalletBalance/${userId}`,
+      `${API_URL}/api/user/wallet/getWalletBalance/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -294,7 +295,7 @@ setFixtures(sortedFixtures);
     setSyncing(true);
     try {
       const { data } = await axios.post(
-        'http://localhost:5000/api/admin/fixtures/admin/savefixtures',
+        `${API_URL}/api/admin/fixtures/admin/savefixtures`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } }
       );
@@ -310,7 +311,7 @@ setFixtures(sortedFixtures);
     setRefreshing(true);
     try {
       const response = await axios.get(
-        'http://localhost:5000/api/admin/fixtures/FetchFromDB/getFixtures',
+        `${API_URL}/api/admin/fixtures/FetchFromDB/getFixtures`,
         { headers: { Expires: '0' } }
       );
       if (response.data.success) {

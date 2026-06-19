@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/UserTeamsPage.css';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const UserTeamsPage = () => {
   const [teams, setTeams] = useState([]);
@@ -25,7 +26,7 @@ const UserTeamsPage = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/user/team/my_teams', {
+        const response = await axios.get(`${API_URL}/api/user/team/my_teams`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
