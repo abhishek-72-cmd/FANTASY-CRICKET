@@ -422,11 +422,14 @@ exports.sendRegistrationOtp = async (req, res) => {
     return res.json({
       message:'OTP sent successfully'
     });
+  } catch(error) {
+    console.error("OTP ERROR:", error);
+    console.error("OTP ERROR MESSAGE:", error.message);
+    console.error("OTP ERROR STACK:", error.stack);
 
-  } catch (error) {
-    console.error("SEND REGISTRATION OTP ERROR:", error);
     return res.status(500).json({
-      message: "Failed to send OTP"
+      success: false,
+      message: error.message
     });
   }
 };
