@@ -3,7 +3,7 @@ const db = require("../../../config/db/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const {OAuth2Client} = require ('google-auth-library');
- const { sendOtpMail } = require('../../../services/user/EmailServices/emailservice.js');
+ const { sendOtpMail } = require('../../../services/user/emailServices/emailservice.js');
 const { validationResult } = require('express-validator');
 const { createWallet } = require('../../../paymentControllers/userWallet');
 const generateOtp = () => {
@@ -115,7 +115,6 @@ exports.googleLogin = async (req, res) => {
     });
   }
 };
-
 
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -434,59 +433,6 @@ exports.sendRegistrationOtp = async (req, res) => {
   }
 };
 
-exports.verifyRegistrationOtp = async (req, res) => {
-  try {
-    console.log("=== VERIFY REGISTRATION OTP START ===");
-    console.log("BODY:", req.body);
-
-    const { email, otp } = req.body;
-    console.log("EMAIL:", email);
-    console.log("OTP:", otp);
-
-    const [rows] = await db.query(
-      `SELECT *
-       FROM otp_verifications
-       WHERE email=?
-       AND otp=?
-       AND purpose='registration'
-       AND expires_at > NOW()
-       ORDER BY id DESC
-       LIMIT 1`,
-      [email, otp]
-    );
-
-    console.log("OTP LOOKUP ROWS:", rows);
-
-    if (rows.length === 0) {
-      console.log("VERIFY REG OTP FAIL: Invalid OTP");
-      return res.status(400).json({
-        message:'Invalid OTP'
-      });
-    }
-
-    const updateResult = await db.query(
-      `UPDATE otp_verifications
-       SET verified=1
-       WHERE id=?`,
-      [rows[0].id]
-    );
-
-    console.log("OTP UPDATE RESULT:", updateResult);
-    console.log("VERIFY REG OTP SUCCESS");
-
-    return res.json({
-      message:'OTP verified'
-    });
-
-  } catch (error) {
-    console.error("VERIFY REG OTP ERROR:", error);
-    return res.status(500).json({
-      message: "Failed to verify registration OTP"
-    });
-  }
-};
-
-
 exports.sendResetOtp = async (req, res) => {
   try {
     console.log("=== SEND RESET OTP START ===");
@@ -561,6 +507,57 @@ exports.sendResetOtp = async (req, res) => {
   }
 };
 
+exports.verifyRegistrationOtp = async (req, res) => {
+  try {
+    console.log("=== VERIFY REGISTRATION OTP START ===");
+    console.log("BODY:", req.body);
+
+    const { email, otp } = req.body;
+    console.log("EMAIL:", email);
+    console.log("OTP:", otp);
+
+    const [rows] = await db.query(
+      `SELECT *
+       FROM otp_verifications
+       WHERE email=?
+       AND otp=?
+       AND purpose='registration'
+       AND expires_at > NOW()
+       ORDER BY id DESC
+       LIMIT 1`,
+      [email, otp]
+    );
+
+    console.log("OTP LOOKUP ROWS:", rows);
+
+    if (rows.length === 0) {
+      console.log("VERIFY REG OTP FAIL: Invalid OTP");
+      return res.status(400).json({
+        message:'Invalid OTP'
+      });
+    }
+
+    const updateResult = await db.query(
+      `UPDATE otp_verifications
+       SET verified=1
+       WHERE id=?`,
+      [rows[0].id]
+    );
+
+    console.log("OTP UPDATE RESULT:", updateResult);
+    console.log("VERIFY REG OTP SUCCESS");
+
+    return res.json({
+      message:'OTP verified'
+    });
+
+  } catch (error) {
+    console.error("VERIFY REG OTP ERROR:", error);
+    return res.status(500).json({
+      message: "Failed to verify registration OTP"
+    });
+  }
+};
 
 exports.verifyResetOtp = async (req, res) => {
   try {
