@@ -122,7 +122,7 @@ const sendOtp = async (e) => {
 e.preventDefault();
 
 try {
-
+ console.log('send otp clicked');
   setLoading(true);
 
   const res = await axios.post(
@@ -250,7 +250,6 @@ return ( <div className="auth-container">
             required
           />
         </div>
-
         <button
           type="submit"
           className="auth-button"
@@ -258,9 +257,7 @@ return ( <div className="auth-container">
         >
           {loading ? 'Sending OTP...' : 'Send OTP'}
         </button>
-
       </form>
-
     )}
 
     {step === 2 && (

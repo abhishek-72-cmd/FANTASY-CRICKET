@@ -398,6 +398,7 @@ const fetchBalance = useCallback(async () => {
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+
       {/* topbar */}
       <Topbar
         onSync={handleSync}
@@ -501,9 +502,9 @@ const Topbar = ({ onSync, onRefresh, onLogout, syncing, refreshing, walletBalanc
     </div>
 
     <div className="am-topbar-actions">
-      <button className="btn btn-ghost" onClick={onSync} disabled={syncing}>
+      {/* <button className="btn btn-ghost" onClick={onSync} disabled={syncing}>
         <Icon.Sync /> {syncing ? 'Syncing…' : 'Sync'}
-      </button>
+      </button> */}
 
 
    <div className="wallet-chip" onClick={onFetchBalance} title="Wallet Balance">

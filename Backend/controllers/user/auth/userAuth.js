@@ -3,8 +3,7 @@ const db = require("../../../config/db/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const {OAuth2Client} = require ('google-auth-library');
-const transporter = require('./mailer');
-const { sendOtpMail } = require('./mailService');
+ const { sendOtpMail } = require('../../../services/user/EmailServices/emailservice.js');
 const { validationResult } = require('express-validator');
 const { createWallet } = require('../../../paymentControllers/userWallet');
 const generateOtp = () => {
@@ -114,6 +113,117 @@ exports.googleLogin = async (req, res) => {
     return res.status(500).json({
       message: 'Google login failed'
     });
+  }
+};
+
+
+exports.login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    console.log("=== LOGIN START ===");
+    console.log("BODY:", req.body);
+    console.log("EMAIL:", email);
+    console.log("PASSWORD:", password);
+
+    if (!email || !password) {
+      console.log("LOGIN FAIL: Missing email/password");
+      return res.status(400).json({
+        message:
+          "Email and password are required"
+      });
+    }
+
+    if (!emailRegex.test(email)) {
+      console.log("LOGIN FAIL: Invalid email format");
+      return res.status(400).json({
+        message: "Invalid email format"
+      });
+    }
+
+    console.log("Finding user by email...");
+    const [rows] = await db.query(
+      `
+      SELECT *
+      FROM users
+      WHERE email = ?
+      `,
+      [email]
+    );
+
+    console.log("USER ROWS:", rows);
+
+    if (rows.length === 0) {
+      console.log("LOGIN FAIL: User not found");
+      return res.status(401).json({
+        message:
+          "Invalid email or password"
+      });
+    }
+
+    const user = rows[0];
+    console.log("USER FOUND:", user);
+
+    if (user.auth_provider === 'google') {
+      console.log("LOGIN FAIL: Google account");
+      return res.status(400).json({
+        message:
+          "This account uses Google Sign-In. Please continue with Google."
+      });
+    }
+
+    if (!user.is_verified) {
+      console.log("LOGIN FAIL: Email not verified");
+      return res.status(400).json({
+        message:
+          "Please verify your email before login."
+      });
+    }
+
+    console.log("Comparing password...");
+    const match = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    console.log("PASSWORD MATCH:", match);
+
+    if (!match) {
+      console.log("LOGIN FAIL: Password mismatch");
+      return res.status(401).json({
+        message:
+          "Invalid email or password"
+      });
+    }
+
+    await createWallet(user.id);
+
+    console.log("Signing JWT...");
+    const token = jwt.sign(
+      {
+        userId: user.id
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d"
+      }
+    );
+
+    console.log("LOGIN SUCCESS:", user.id);
+
+    return res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    next(err);
   }
 };
 
@@ -273,116 +383,6 @@ exports.register = async (req, res, next) => {
   }
 };
 
-exports.login = async (req, res, next) => {
-  const { email, password } = req.body;
-
-  try {
-    console.log("=== LOGIN START ===");
-    console.log("BODY:", req.body);
-    console.log("EMAIL:", email);
-    console.log("PASSWORD:", password);
-
-    if (!email || !password) {
-      console.log("LOGIN FAIL: Missing email/password");
-      return res.status(400).json({
-        message:
-          "Email and password are required"
-      });
-    }
-
-    if (!emailRegex.test(email)) {
-      console.log("LOGIN FAIL: Invalid email format");
-      return res.status(400).json({
-        message: "Invalid email format"
-      });
-    }
-
-    console.log("Finding user by email...");
-    const [rows] = await db.query(
-      `
-      SELECT *
-      FROM users
-      WHERE email = ?
-      `,
-      [email]
-    );
-
-    console.log("USER ROWS:", rows);
-
-    if (rows.length === 0) {
-      console.log("LOGIN FAIL: User not found");
-      return res.status(401).json({
-        message:
-          "Invalid email or password"
-      });
-    }
-
-    const user = rows[0];
-    console.log("USER FOUND:", user);
-
-    if (user.auth_provider === 'google') {
-      console.log("LOGIN FAIL: Google account");
-      return res.status(400).json({
-        message:
-          "This account uses Google Sign-In. Please continue with Google."
-      });
-    }
-
-    if (!user.is_verified) {
-      console.log("LOGIN FAIL: Email not verified");
-      return res.status(400).json({
-        message:
-          "Please verify your email before login."
-      });
-    }
-
-    console.log("Comparing password...");
-    const match = await bcrypt.compare(
-      password,
-      user.password
-    );
-
-    console.log("PASSWORD MATCH:", match);
-
-    if (!match) {
-      console.log("LOGIN FAIL: Password mismatch");
-      return res.status(401).json({
-        message:
-          "Invalid email or password"
-      });
-    }
-
-    await createWallet(user.id);
-
-    console.log("Signing JWT...");
-    const token = jwt.sign(
-      {
-        userId: user.id
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d"
-      }
-    );
-
-    console.log("LOGIN SUCCESS:", user.id);
-
-    return res.json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email
-      }
-    });
-
-  } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    next(err);
-  }
-};
-
 exports.sendRegistrationOtp = async (req, res) => {
   try {
     console.log("=== SEND REGISTRATION OTP START ===");
@@ -433,7 +433,6 @@ exports.sendRegistrationOtp = async (req, res) => {
     });
   }
 };
-
 
 exports.verifyRegistrationOtp = async (req, res) => {
   try {

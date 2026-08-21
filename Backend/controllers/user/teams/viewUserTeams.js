@@ -106,7 +106,7 @@ contestsData.forEach(c => {
   } catch (err) {
     console.error("Error fetching user teams:", err);
     if (err.name === "JsonWebTokenError") {
-      return res.status(401).json({ message: "Invalid token" });
+      return res.status(401).json({ message: "Invalid token please login" });
     }
     res.status(500).json({
       success: false,

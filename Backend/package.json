@@ -24,8 +24,8 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1",
     "node-cron": "^4.2.1",
-    "nodemailer": "^7.0.13",
     "razorpay": "^2.9.6",
+    "resend": "^6.21.0",
     "router": "^2.2.0",
     "Router": "^2.1.0"
   }
